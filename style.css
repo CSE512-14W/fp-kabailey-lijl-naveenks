@@ -1,0 +1,79 @@
+@charset "utf-8";
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#container {
+  margin-left:auto;
+  margin-right:auto;
+}
+
+#topbar {
+  height: 50px;
+  width: auto;
+  border: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+#canvas {
+  height: 600px;
+  width: 900px;
+  margin: 0px;
+  padding: 0px;
+  border-style:solid;
+  border-width:1px;
+  border-color:#a0a0a0;
+  border-radius:10px;
+}
+
+#sidebar {
+  height: 600px;
+  width: 200px;
+  padding: 10px;
+  border: 1px;
+  border-style:solid;
+  border-color:#a0a0a0;
+  vertical-align:top;
+  border-radius:10px;
+}
+
+#topbar .view {
+  float: left;
+  height: 50px;
+  width: 150px;
+  margin: 2px;
+  border: 0px;
+  padding: 0px;
+  background-color: #6baed6;
+  color: blue;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px;
+  cursor: pointer;
+  border-radius:10px;
+}
+
+#topbar .view:hover {
+  background-color: #3182bd;
+}
+
+#sidebar p .filterlabel {
+  color: #3182bd;
+  text-transform:capitalize;
+  font-variant:small-caps;
+  font-weight:bold;
+  font-size: 120%;
+}
+
+.chart rect {
+  fill: steelblue;
+}
+
+.chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}

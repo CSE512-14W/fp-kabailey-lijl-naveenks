@@ -1,6 +1,19 @@
+function show_loading()
+{
+  var load_str = "<div id=loadimage><img src=loading.gif width=150 height=150></div>";
+  document.getElementById('canvas').innerHTML = load_str;
+}
+
+function hide_loading()
+{
+  element = document.getElementById('loadimage');
+  element.parentNode.removeChild(element);
+}
+
 function view1()
 {
-  document.getElementById('canvas').innerHTML = "";
+  show_loading();
+
   var map = new Datamap({
     scope: 'world',
     element: document.getElementById('canvas'),
@@ -24,11 +37,14 @@ function view1()
       MAD: {fillKey: 'gt50' }       
     }
   });
+
+  hide_loading();
 }
 
 function view2()
 {
-  document.getElementById('canvas').innerHTML = "";
+  show_loading();
+
   var map = new Datamap({
     scope: 'usa',
     element: document.getElementById('canvas'),
@@ -46,11 +62,14 @@ function view2()
       DE: {fillKey: 'gt50' }       
     }
   });
+
+  hide_loading();
 }
 
 function view3()
 {
-  document.getElementById('canvas').innerHTML = "<svg class=\"chart\"></svg>";
+  show_loading();
+  document.getElementById('canvas').innerHTML += "<svg class=\"chart\"></svg>";
 
   var data = [4, 8, 15, 16, 23, 42];
 
@@ -78,9 +97,13 @@ function view3()
       .attr("y", barHeight / 2)
       .attr("dy", ".35em")
       .text(function(d) { return d; });
+  
+  hide_loading();
 }
 
 function view4()
 {
+  show_loading();
   alert("Nothing in view 4 yet!");
+  hide_loading();
 }

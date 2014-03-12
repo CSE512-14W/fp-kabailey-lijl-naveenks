@@ -44,7 +44,7 @@ td {
 #topbar .view {
   float: left;
   height: 50px;
-  width: 150px;
+  width: 100px;
   margin: 2px;
   border: 0px;
   padding: 0px;
@@ -123,4 +123,20 @@ td {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
+}
+
+/* View 5 specific styles. */
+.view5 {
+  font: 10px sans-serif;
+}
+
+.view5 .axis path,
+.view5 .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.view5 .dot {
+  stroke: #000;
 }

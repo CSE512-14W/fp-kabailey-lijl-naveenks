@@ -79,12 +79,48 @@ td {
   z-index:100;
 }
 
-.chart rect {
+/* View 3 specific styles. */
+.view3 .bar {
   fill: steelblue;
 }
 
-.chart text {
-  fill: white;
+.view3 .bar:hover {
+  fill: brown;
+}
+
+.view3 .axis {
   font: 10px sans-serif;
-  text-anchor: end;
+}
+
+.view3 .axis path,
+.view3 .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.view3 .x.axis path {
+  display: none;
+}
+
+/* View 4 specific styles. */
+.view4 {
+  font: 10px sans-serif;
+}
+
+.view4 .axis path,
+.view4 .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.view4 .x.axis path {
+  display: none;
+}
+
+.view4 .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
 }

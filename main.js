@@ -1,3 +1,6 @@
+var currentView = 'view1';
+var box1 = false;
+
 function show_loading()
 {
   var load_str = "<div id=loadimage><img src=loading.gif width=150 height=150></div>";
@@ -10,9 +13,24 @@ function hide_loading()
   element.parentNode.removeChild(element);
 }
 
+function data_filter(d)
+{
+    if (box1) {
+	return d.frequency > 0.05;
+    }
+
+    return true;
+}
+
+function checkbox1(checked)
+{
+    box1 = checked;
+    window[currentView]();
+}
 
 function view1()
 {
+    currentView = 'view1';
   show_loading();
 
   var map = new Datamap({
@@ -42,9 +60,9 @@ function view1()
   hide_loading();
 }
 
-
 function view2()
 {
+    currentView = 'view2';
   show_loading();
 
   var map = new Datamap({
@@ -71,6 +89,7 @@ function view2()
 
 function view3()
 {
+    currentView = 'view3';
   show_loading();
 
   var margin = {top: 20, right: 20, bottom: 30, left: 40},
@@ -124,7 +143,7 @@ function view3()
         .text("Frequency");
 
     svg.selectAll(".bar")
-        .data(data)
+          .data(data.filter(function(d){return data_filter(d);}))
       .enter().append("rect")
         .attr("class", "bar")
         .attr("x", function(d) { return x(d.letter); })
@@ -140,6 +159,7 @@ function view3()
 
 function view4()
 {
+    currentView = 'view4';
   show_loading();
 
   var margin = {top: 20, right: 80, bottom: 30, left: 50},
@@ -238,6 +258,7 @@ function view4()
 
 function view5()
 {
+    currentView = 'view5';
   show_loading();
 
   var margin = {top: 20, right: 20, bottom: 30, left: 40},

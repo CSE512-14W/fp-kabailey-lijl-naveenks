@@ -271,10 +271,51 @@ function view5()
     data.forEach(function(d) {
       d.sepalLength = +d.sepalLength;
       d.sepalWidth = +d.sepalWidth;
+      d.petalLength = +d.petalLength;
+      d.petalWidth = +d.petalWidth;
     });
+    
+    /* Get the axes from select dropdown menu. */
+    var select1 = document.getElementById("variable1");
+    var var1 = select1.options[select1.selectedIndex].value;
+    var var1t = select1.options[select1.selectedIndex].text;
 
-    x.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
-    y.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
+    var select2 = document.getElementById("variable2");
+    var var2 = select2.options[select2.selectedIndex].value;
+    var var2t = select2.options[select2.selectedIndex].text;
+
+    switch (var1) {
+      case "op1":
+        x.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
+        break;
+      case "op2":
+        x.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
+        break;
+      case "op3":
+        x.domain(d3.extent(data, function(d) { return d.petalLength; })).nice();
+        break;
+      case "op4":
+        x.domain(d3.extent(data, function(d) { return d.petalWidth; })).nice();
+        break;
+    }
+
+    switch (var2) {
+      case "op1":
+        y.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
+        break;
+      case "op2":
+        y.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
+        break;
+      case "op3":
+        y.domain(d3.extent(data, function(d) { return d.petalLength; })).nice();
+        break;
+      case "op4":
+        y.domain(d3.extent(data, function(d) { return d.petalWidth; })).nice();
+        break;
+    }
+
+    //x.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
+    //y.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
 
     svg.append("g")
         .attr("class", "x axis")
@@ -285,7 +326,8 @@ function view5()
         .attr("x", width)
         .attr("y", -6)
         .style("text-anchor", "end")
-        .text("Sepal Width (cm)");
+        .text(var1t);
+        //.text("Sepal Width (cm)");
 
     svg.append("g")
         .attr("class", "y axis")
@@ -296,15 +338,32 @@ function view5()
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Sepal Length (cm)")
+        .text(var2t);
+        //.text("Sepal Length (cm)")
 
     svg.selectAll(".dot")
         .data(data)
       .enter().append("circle")
         .attr("class", "dot")
         .attr("r", 3.5)
-        .attr("cx", function(d) { return x(d.sepalWidth); })
-        .attr("cy", function(d) { return y(d.sepalLength); })
+        .attr("cx", function(d) { 
+                      switch (var1) {
+                        case "op1": return x(d.sepalLength);
+                        case "op2": return x(d.sepalWidth);
+                        case "op3": return x(d.petalLength);
+                        case "op4": return x(d.petalWidth);
+                      }
+                      //return x(d.sepalWidth);
+                    })
+        .attr("cy", function(d) {
+                      switch (var2) {
+                        case "op1": return y(d.sepalLength);
+                        case "op2": return y(d.sepalWidth);
+                        case "op3": return y(d.petalLength);
+                        case "op4": return y(d.petalWidth);
+                      }
+                      //return y(d.sepalLength);
+                    })
         .style("fill", function(d) { return color(d.species); });
 
     var legend = svg.selectAll(".legend")

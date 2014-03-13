@@ -79,6 +79,28 @@ td {
   z-index:100;
 }
 
+/* View 2 specific. */
+.view2 {
+  font: 10px sans-serif;
+}
+
+.view2 .axis path,
+.view2 .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.view2 .x.axis path {
+  display: none;
+}
+
+.view2 .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
 /* View 3 specific styles. */
 .view3 .bar {
   fill: steelblue;

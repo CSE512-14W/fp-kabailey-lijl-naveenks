@@ -1,6 +1,13 @@
 var currentView = 'view1';
 var box1 = false;
+var samplesize = 10;
 
+function sampleSize() {
+    var d = document.getElementById("sampleSize");
+    samplesize = d.options[d.selectedIndex].value;
+    window[currentView]();
+}
+    
 function show_loading()
 {
   var load_str = "<div id=loadimage><img src=loading.gif width=150 height=150></div>";
@@ -88,8 +95,8 @@ function view2()
       width = 900 - margin.left - margin.right,
       height = 600 - margin.top - margin.bottom;
 
-  var x = d3.time.scale()
-    .range([0, width]);
+    var x = d3.scale.linear()
+	.range([0, width]);
 
   var y = d3.scale.linear()
     .range([height, 0]);
@@ -103,8 +110,8 @@ function view2()
     .orient("left");
 
   var line = d3.svg.line()
-    .x(function(d) { return x(d.qno); })
-    .y(function(d) { return y(d.marks); });
+	.x(function(d) { return x(d.question); })
+	.y(function(d) { return y(d.score); });
 
   var svg = d3.select("#canvas").append("svg")
     .attr("class", "view2")
@@ -113,36 +120,48 @@ function view2()
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  d3.csv("data/midterm_sample.tsv", function(error, data) {
 
-      x.domain(d3.extent(data, function(d) { return d.date; }));
-      y.domain(d3.extent(data, function(d) { return d.close; }));
+    var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
 
-      svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+    var i;
+    for (i = 1; i <= samplesize; i++) {
+	var data_file = "data/test_data";
+	data_file += i.toString();
+	data_file += ".csv";
 
-      svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Price ($)");
+	d3.csv(data_file, function(error, data) {
+	    var sum = 0;
+	    data.forEach(function(d) {
+		d.question = +d.question;
+		d.score = +d.score;
+		d.score = d.score * q_scores[d.question] + sum;
+		sum = d.score;
+	    });
 
-      data.forEach(function(d) {
+	    x.domain([1, 64]);
+	    y.domain([0, 500]);
 
-        svg.append("path")
-          .datum(data)
-          .attr("class", "line")
-          .attr("d", line);
-        
-      });
+	    svg.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis);
 
-  });
+	    svg.append("g")
+		.attr("class", "y axis")
+		.call(yAxis)
+		.append("text")
+		.attr("transform", "rotate(-90)")
+		.attr("y", 6)
+		.attr("dy", ".71em")
+		.style("text-anchor", "end")
+		.text("Score ");
+
+	    svg.append("path")
+		.datum(data)
+		.attr("class", "line")
+		.attr("d", line);
+	});
+    }
 
   hide_loading();
 }

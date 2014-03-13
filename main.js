@@ -1,5 +1,10 @@
 var currentView = 'view1';
-var box1 = false;
+var box1 = true;
+var box2 = true;
+var box3 = true;
+var box4 = true;
+var box5 = true;
+var box6 = true;
 
 function show_loading()
 {
@@ -25,6 +30,31 @@ function data_filter(d)
 function checkbox1(checked)
 {
     box1 = checked;
+    window[currentView]();
+}
+function checkbox2(checked)
+{
+    box2 = checked;
+    window[currentView]();
+}
+function checkbox3(checked)
+{
+    box3 = checked;
+    window[currentView]();
+}
+function checkbox4(checked)
+{
+    box4 = checked;
+    window[currentView]();
+}
+function checkbox5(checked)
+{
+    box5 = checked;
+    window[currentView]();
+}
+function checkbox6(checked)
+{
+    box6 = checked;
     window[currentView]();
 }
 
@@ -157,7 +187,7 @@ function view3()
 }
 
 
-function view4()
+function view4() //grade timeline
 {
     currentView = 'view4';
   show_loading();
@@ -166,15 +196,15 @@ function view4()
       width = 900 - margin.left - margin.right,
       height = 600 - margin.top - margin.bottom;
 
-  var parseDate = d3.time.format("%Y%m%d").parse;
-
-  var x = d3.time.scale()
+  var x = d3.scale.linear()
       .range([0, width]);
 
   var y = d3.scale.linear()
       .range([height, 0]);
 
+  //change based on coloring schema
   var color = d3.scale.category10();
+  
 
   var xAxis = d3.svg.axis()
       .scale(x)
@@ -184,10 +214,9 @@ function view4()
       .scale(y)
       .orient("left");
 
-  var line = d3.svg.line()
-      .interpolate("basis")
-      .x(function(d) { return x(d.date); })
-      .y(function(d) { return y(d.temperature); });
+  var lineview = d3.svg.line()
+      .x(function(d) {return x(d.HW); })
+      .y(function(d) {return y(d.SCORE);  });
 
   var svg = d3.select("#canvas").append("svg")
       .attr("class", "view4")
@@ -196,60 +225,79 @@ function view4()
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  d3.tsv("data/view4.tsv", function(error, data) {
-    color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
+  d3.csv("data/hw001.csv",  function(error, data) {
+	  data.forEach(function(d) {
+		  d.ROWID = +d.ROWID;
+		  d.HW = +d.HW;
+		  d.STUDENTID= +d.STUDENTID;
+		  d.TIMESTAMP= +d.TIMESTAMP;
+		  d.SUBMISSION= +d.SUBMISSION;
+		  d.SCORE = +d.SCORE;
+	      });
+	  
 
-    data.forEach(function(d) {
-      d.date = parseDate(d.date);
-    });
+	  //	  x.domain(d3.extent(data, function(d) { return d.HW;})).nice();
+	  x.domain([0,18]);
+	  y.domain(d3.extent(data, function(d) { return d.SCORE;})).nice();
+	  
+	  svg.append("g")
+	      .attr("class", "x axis")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(xAxis)
+	      //	    .append("text")
+	      //	      .attr("class", "label")
+	      //	      .attr("x", width)
+	      //	      .attr("y", -6)
+	      //	      .style("text-anchor", "end")
+	      //.text("Assignment");
 
-    var cities = color.domain().map(function(name) {
-      return {
-        name: name,
-        values: data.map(function(d) {
-          return {date: d.date, temperature: +d[name]};
-        })
-      };
-    });
+	  svg.append("g")
+	      .attr("class", "y axis")
+	      .call(yAxis)
+	    .append("text")
+	      .attr("class", "label")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Score");
+   
+    var stripped_data = data.filter(function(d){ 
+	    var sub2 = d.SUBMISSION==2;
+	    switch (d.HW) {
+	    case 6: return sub2 && box1;
+	    case 5: return sub2 && box2;
+	    case 11: return sub2 && box3;
+	    case 13: return sub2 && box4;
+	    case 15: return sub2 && box5;
+	    case 17: return sub2 && box6;		       
+	    }});
+    
+    var studentids = [];
+    data.map(function(d){studentids.push(d.STUDENTID);});
+    console.log(studentids);
+    for (var s in studentids ){
+	//	console.log(studentids[s]);
+	//var s = 1038;
+	var student_data = stripped_data.filter(function(d){ return d.STUDENTID==studentids[s] })
+	    .filter(function(d){ return d.SUBMISSION==2 })
+	    .sort(function(a,b) {return (b.HW - a.HW)*100 + (b.SUBMISSION-a.SUBMISSION); });
+							    
+	svg.append("path")
+	    .attr("class", "line")
+	    .attr("d", lineview(student_data))
+	    .style("stroke", "grey");
+	}
+    svg.selectAll(".dot")
+        .data(stripped_data)
+      .enter()
+      .append("circle")
+        .attr("class", "dot")
+        .attr("r", 3.5)
+        .attr("cx", function(d) { return x(d.HW);       })
+        .attr("cy", function(d) { return y(d.SCORE);    })
+	.style("fill", function(d) {return color (d.HW); } );
 
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-
-    y.domain([
-      d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
-      d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
-    ]);
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-      .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Temperature (ºF)");
-
-    var city = svg.selectAll(".city")
-        .data(cities)
-      .enter().append("g")
-        .attr("class", "city");
-
-    city.append("path")
-        .attr("class", "line")
-        .attr("d", function(d) { return line(d.values); })
-        .style("stroke", function(d) { return color(d.name); });
-
-    city.append("text")
-        .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-        .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
-        .attr("x", 3)
-        .attr("dy", ".35em")
-        .text(function(d) { return d.name; });
   });
 
   hide_loading();

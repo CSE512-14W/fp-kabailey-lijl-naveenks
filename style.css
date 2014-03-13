@@ -116,7 +116,9 @@ td {
 }
 
 .view4 .x.axis path {
-  display: none;
+    fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 .view4 .line {

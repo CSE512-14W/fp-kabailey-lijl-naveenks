@@ -150,10 +150,57 @@ function view2()
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
     var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
 
-    var i;
+    d3.csv("data/test_data.csv", function(error, data) {
+	var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
+	var students = keys.map(function(name) {
+	    var sum = 0;
+	    return {
+		name: name,
+		values: data.map(function(d) {
+		    var score = +d[name];
+		    score = score + sum;
+		    sum = score;
+		    return {
+			question: +d.question,
+			score: score
+		    };
+		})
+	    };
+	});
+
+	x.domain([1, 10]);
+	y.domain([0, 200]);
+	
+	svg.append("g")
+	    .attr("class", "x axis")
+	    .attr("transform", "translate(0," + height + ")")
+	    .call(xAxis);
+
+	svg.append("g")
+	    .attr("class", "y axis")
+	    .call(yAxis)
+	    .append("text")
+	    .attr("transform", "rotate(-90)")
+	    .attr("y", 6)
+	    .attr("dy", ".71em")
+	    .style("text-anchor", "end")
+	    .text("Score ");
+
+
+	var student = svg.selectAll(".student")
+	    .data(students)
+	    .enter()
+	    .append("g")
+	    .attr("class", "student");
+
+	student.append("path")
+	    .attr("class", "line")
+	    .attr("d", function(d) { return line(d.values); })
+	
+    });	
+/*
     for (i = 1; i <= samplesize; i++) {
 	var data_file = "data/test_data";
 	data_file += i.toString();
@@ -192,6 +239,7 @@ function view2()
 		.attr("d", line);
 	});
     }
+*/
 
   hide_loading();
 }

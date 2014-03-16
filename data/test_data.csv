@@ -1,3 +1,6 @@
-user_id,access_group_id,submission_time,submission_id,1,2,3,4,5,6,7,8,9,10
-1038,4,Mon 18 Feb 2013  3:06 AM UTC,479912,1,0,0,1,1,1,0,0,1,0
-1152,4,Mon 18 Feb 2013  4:50 PM UTC,485302,1,0,0,1,1,1,0,0,1,1
+question,score,score2
+1,10,15
+2,20,10
+3,5,25
+4,10,15
+5,10,20

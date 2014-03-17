@@ -164,3 +164,23 @@ td {
 .view5 .dot {
   stroke: #000;
 }
+
+.area.a1 {
+    fill: blue;
+    opacity: 0.5;
+}
+
+.area.a2 {
+    fill: yellow;
+    opacity: 0.5;
+}
+
+.area.a3 {
+    fill: green;
+    opacity: 0.5;
+}
+
+.area.a4 {
+    fill: orange;
+    opacity: 0.5;
+}

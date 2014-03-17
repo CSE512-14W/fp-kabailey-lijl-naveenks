@@ -143,6 +143,11 @@ function view2()
 	.x(function(d) { return x(d.question); })
 	.y(function(d) { return y(d.score); });
 
+    var area = d3.svg.area()
+	.x(function(d) {return x(d.question); })
+	.y0(function(d) {return y(d.low); })
+	.y1(function(d) {return y(d.high); })
+
   var svg = d3.select("#canvas").append("svg")
     .attr("class", "view2")
     .attr("width", width + margin.left + margin.right)
@@ -152,16 +157,22 @@ function view2()
 
     var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
 
-    d3.csv("data/test_data.csv", function(error, data) {
+    var percentiles = [0, 0.33, 0.66, 1];
+
+    var styles = ["area a1", "area a2", "area a3", "area a4"];
+
+    d3.csv("data/midterm_data.csv", function(error, data) {
 	var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
 	var students = keys.map(function(name) {
 	    var sum = 0;
+	    var index = 0;
 	    return {
 		name: name,
 		values: data.map(function(d) {
 		    var score = +d[name];
-		    score = score + sum;
+		    score = score * q_scores[index] + sum;
 		    sum = score;
+		    index += 1;
 		    return {
 			question: +d.question,
 			score: score
@@ -170,8 +181,46 @@ function view2()
 	    };
 	});
 
-	x.domain([1, 10]);
-	y.domain([0, 200]);
+	var num_questions = students[0].values.length;
+	students.sort(function(a, b) {return a.values[num_questions-1].score - b.values[num_questions-1].score});
+
+	var index, i, k;
+	var bands = new Array();
+	
+	for (k = 0; k < percentiles.length - 1; k++) {
+	    
+	    bands[k]= new Object();
+
+	    bands[k].name = "band" + k;
+	    bands[k].index = k;
+	    bands[k].values = new Array();
+
+	    for (i = 0; i < num_questions; i++) {
+		bands[k].values[i] = new Object();
+		bands[k].values[i].question = i + 1;
+		bands[k].values[i].high = 0;
+		bands[k].values[i].low = Number.MAX_VALUE;
+	    }
+
+	    for (i = Math.round(students.length * percentiles[k]); i < students.length * percentiles[k+1]; i++) {
+		index = 0;
+		students[i].values.forEach(function(d) {
+		    if (d.score < bands[k].values[index].low)
+			bands[k].values[index].low = d.score;
+		    
+		    if (d.score > bands[k].values[index].high)
+			bands[k].values[index].high = d.score;
+
+		    if (bands[k].values[index].low == bands[k].values[index].high)
+			bands[k].values[index].high += 1;
+
+		    index += 1;
+		});
+	    }
+	}
+
+	x.domain([1, 64]);
+	y.domain([0, 500]);
 	
 	svg.append("g")
 	    .attr("class", "x axis")
@@ -189,57 +238,33 @@ function view2()
 	    .text("Score ");
 
 
-	var student = svg.selectAll(".student")
-	    .data(students)
+	for (i = 0; i < bands.length; i++) {
+	    svg.append("path")
+		.datum(bands[i].values)
+		.attr("class", styles[i])
+		.attr("d", area);
+	}
+
+	var legend = svg.selectAll(".legend")
+	    .data(bands)
 	    .enter()
 	    .append("g")
-	    .attr("class", "student");
+	    .attr("class", "legend")
+	    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-	student.append("path")
-	    .attr("class", "line")
-	    .attr("d", function(d) { return line(d.values); })
-	
-    });	
-/*
-    for (i = 1; i <= samplesize; i++) {
-	var data_file = "data/test_data";
-	data_file += i.toString();
-	data_file += ".csv";
+	legend.append("rect")
+	    .attr("x", width - 18)
+	    .attr("width", 18)
+	    .attr("height", 18)
+	    .attr("class", function(d) { return styles[d.index];});
 
-	d3.csv(data_file, function(error, data) {
-	    var sum = 0;
-	    data.forEach(function(d) {
-		d.question = +d.question;
-		d.score = +d.score;
-		d.score = d.score * q_scores[d.question] + sum;
-		sum = d.score;
-	    });
-
-	    x.domain([1, 64]);
-	    y.domain([0, 500]);
-
-	    svg.append("g")
-		.attr("class", "x axis")
-		.attr("transform", "translate(0," + height + ")")
-		.call(xAxis);
-
-	    svg.append("g")
-		.attr("class", "y axis")
-		.call(yAxis)
-		.append("text")
-		.attr("transform", "rotate(-90)")
-		.attr("y", 6)
-		.attr("dy", ".71em")
-		.style("text-anchor", "end")
-		.text("Score ");
-
-	    svg.append("path")
-		.datum(data)
-		.attr("class", "line")
-		.attr("d", line);
-	});
-    }
-*/
+	legend.append("text")
+	    .attr("x", width - 24)
+	    .attr("y", 9)
+	    .attr("dy", ".35em")
+	    .style("text-anchor", "end")
+	    .text(function(d) { return d.name;});
+    });
 
   hide_loading();
 }

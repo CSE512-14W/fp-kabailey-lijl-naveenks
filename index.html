@@ -8,6 +8,7 @@
     <script type="text/javascript" src="d3/datamaps.all.min.js"></script>
     <script type="text/javascript" src="d3/topojson.v1.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="midterm.js"></script>
   </head>
 
   <body>
@@ -17,7 +18,7 @@
   
   <tr><td id=topbar colspan=2>
 <!--    <div class=view onclick="view1()"> Demographics </div> -->
-    <div class=view onclick="view2()"> Midterm </div>
+    <div class=view onclick="midterm()"> Midterm </div>
 <!--    <div class=view onclick="view3()"> Final</div> -->
     <div class=view onclick="view4()"> All Grades</div>
 <!--     <div class=view onclick="view5()"> Impact</div> -->
@@ -27,7 +28,16 @@
   <td><div id=canvas></div></td>
 
   <td><div id=sidebar>
-    <p><span class=filterlabel>Include Assignments</span><br />
+  </div></td>
+
+  </tr></table>
+  </body>
+
+</html>
+
+<!--  not displayed side bars for each view -->
+<div id="sidebar1" style="display: none;">
+  <p><span class=filterlabel>Include Assignments</span><br />
     <input type="checkbox" name="box1" onchange="checkbox1(this.checked)" checked>Assignment 1
     <input type="checkbox" name="box2" onchange="checkbox2(this.checked)" checked>Assignment 2<br />
     <input type="checkbox" name="box3" onchange="checkbox3(this.checked)" checked>Assignment 3
@@ -37,7 +47,7 @@
     <input type="checkbox" name="box7">Midterm Exam<br />     
     <input type="checkbox" name="box8">Final Exam<br /></p>
 
-    <p><span class=filterlabel>Some other options</span><br />
+  <p><span class=filterlabel>Some other options</span><br />
     <input type="radio" name="box1">Course Offering<br />
     <input type="radio" name="box1">Completers  <br />
     <input type="radio" name="box1">Final Grade<br />
@@ -45,8 +55,8 @@
     <input type="radio" name="box1">Age Group (unavailable) <br />
     <input type="radio" name="box1">Country (unavailable <br />
     <input type="radio" name="box1">None<br /></p>
-    
-    <p><span class=filterlabel>Even more options</span><br />
+  
+  <p><span class=filterlabel>Even more options</span><br />
     <select id=variable1 onchange="view5()">
       <option value="op1">Assignment</option>
       <option value="op2">Midterm</option>
@@ -60,18 +70,50 @@
       <option value="op3">Final Grade</option>
       <option value="op4">All </option>
     </select> <br />
-    </p>
+  </p>
 
-    <p><span class=filterlabel>Sample Size</span><br />
-      <select id=sampleSize onchange="sampleSize()">
-	<option value="10">10</option>
-	<option value="20">20</option>
-	<option value="50">50</option>
-      </select> <br />
-    </p>
-  </div></td>
+  <p><span class=filterlabel>Sample Size</span><br />
+    <select id=sampleSize onchange="sampleSize()">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+    </select> <br />
+  </p>
+</div>
 
-  </tr></table>
-  </body>
+<div id="midterm_sidebar" style="display: none;">
+  <p><span class=filterlabel>Include Assignments</span><br />
+    <input type="checkbox" name="box1" onchange="checkbox1(this.checked)" checked>Assignment 1
+    <input type="checkbox" name="box2" onchange="checkbox2(this.checked)" checked>Assignment 2<br />
+    <input type="checkbox" name="box7">Midterm Exam<br />     
+    <input type="checkbox" name="box8">Final Exam<br /></p>
 
-</html>
+  <p><span class=filterlabel>Some other options</span><br />
+    <input type="radio" name="box1">Course Offering<br />
+    <input type="radio" name="box1">Country (unavailable <br />
+    <input type="radio" name="box1">None<br /></p>
+  
+  <p><span class=filterlabel>Even more options</span><br />
+    <select id=variable1 onchange="view5()">
+      <option value="op1">Assignment</option>
+      <option value="op2">Midterm</option>
+      <option value="op3">Final</option>
+      <option value="op4">All</option>
+    </select> <br />
+    versus <br />
+    <select id=variable2 onchange="view5()">
+      <option value="op1">Midterm</option>
+      <option value="op2">Final Exam</option>
+      <option value="op3">Final Grade</option>
+      <option value="op4">All </option>
+    </select> <br />
+  </p>
+
+  <p><span class=filterlabel>Sample Size</span><br />
+    <select id=sampleSize onchange="sampleSize()">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+    </select> <br />
+  </p>
+</div>

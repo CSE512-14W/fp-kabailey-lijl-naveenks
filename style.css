@@ -91,10 +91,6 @@ td {
   shape-rendering: crispEdges;
 }
 
-.view2 .x.axis path {
-  display: none;
-}
-
 .view2 .line {
   fill: none;
   stroke: steelblue;
@@ -119,10 +115,6 @@ td {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
-}
-
-.view3 .x.axis path {
-  display: none;
 }
 
 /* View 4 specific styles. */
@@ -168,19 +160,35 @@ td {
 .area.a1 {
     fill: blue;
     opacity: 0.5;
+    clip-path: url('/#clip');
 }
 
 .area.a2 {
-    fill: yellow;
+    fill: orange;
     opacity: 0.5;
+    clip-path: url('/#clip');
 }
 
 .area.a3 {
     fill: green;
     opacity: 0.5;
+    clip-path: url('/#clip');
 }
 
 .area.a4 {
     fill: orange;
     opacity: 0.5;
+    clip-path: url('/#clip');
+}
+
+.area.a5 {
+    fill: red;
+    opacity: 1;
+    clip-path: url('/#clip');
+}
+
+.brush .extent {
+    stroke: #fff;
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
 }

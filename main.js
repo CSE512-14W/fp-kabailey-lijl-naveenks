@@ -97,178 +97,6 @@ function view1()
   hide_loading();
 }
 
-function view2()
-{
-  currentView = 'view2';
-  show_loading();
-
-/*
-  var map = new Datamap({
-    scope: 'usa',
-    element: document.getElementById('canvas'),
-    
-    fills: {
-      defaultFill: '#f0af0a',
-      lt50: 'rgba(0,244,244,0.9)',
-      gt50: 'red'
-    },
-    
-    data: {
-      AZ: {fillKey: 'lt50' },
-      WA: {fillKey: 'lt50' },
-      CO: {fillKey: 'gt50' },
-      DE: {fillKey: 'gt50' }       
-    }
-  });*/
-
-  var margin = {top: 20, right: 20, bottom: 30, left: 50},
-      width = 900 - margin.left - margin.right,
-      height = 600 - margin.top - margin.bottom;
-
-    var x = d3.scale.linear()
-	.range([0, width]);
-
-  var y = d3.scale.linear()
-    .range([height, 0]);
-
-  var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-  var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
-
-  var line = d3.svg.line()
-	.x(function(d) { return x(d.question); })
-	.y(function(d) { return y(d.score); });
-
-    var area = d3.svg.area()
-	.x(function(d) {return x(d.question); })
-	.y0(function(d) {return y(d.low); })
-	.y1(function(d) {return y(d.high); })
-
-  var svg = d3.select("#canvas").append("svg")
-    .attr("class", "view2")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
-
-    var percentiles = [0, 0.33, 0.66, 1];
-
-    var styles = ["area a1", "area a2", "area a3", "area a4"];
-
-    d3.csv("data/midterm_data.csv", function(error, data) {
-	var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
-	var students = keys.map(function(name) {
-	    var sum = 0;
-	    var index = 0;
-	    return {
-		name: name,
-		values: data.map(function(d) {
-		    var score = +d[name];
-		    score = score * q_scores[index] + sum;
-		    sum = score;
-		    index += 1;
-		    return {
-			question: +d.question,
-			score: score
-		    };
-		})
-	    };
-	});
-
-	var num_questions = students[0].values.length;
-	students.sort(function(a, b) {return a.values[num_questions-1].score - b.values[num_questions-1].score});
-
-	var index, i, k;
-	var bands = new Array();
-	
-	for (k = 0; k < percentiles.length - 1; k++) {
-	    
-	    bands[k]= new Object();
-
-	    bands[k].name = "band" + k;
-	    bands[k].index = k;
-	    bands[k].values = new Array();
-
-	    for (i = 0; i < num_questions; i++) {
-		bands[k].values[i] = new Object();
-		bands[k].values[i].question = i + 1;
-		bands[k].values[i].high = 0;
-		bands[k].values[i].low = Number.MAX_VALUE;
-	    }
-
-	    for (i = Math.round(students.length * percentiles[k]); i < students.length * percentiles[k+1]; i++) {
-		index = 0;
-		students[i].values.forEach(function(d) {
-		    if (d.score < bands[k].values[index].low)
-			bands[k].values[index].low = d.score;
-		    
-		    if (d.score > bands[k].values[index].high)
-			bands[k].values[index].high = d.score;
-
-		    if (bands[k].values[index].low == bands[k].values[index].high)
-			bands[k].values[index].high += 1;
-
-		    index += 1;
-		});
-	    }
-	}
-
-	x.domain([1, 64]);
-	y.domain([0, 500]);
-	
-	svg.append("g")
-	    .attr("class", "x axis")
-	    .attr("transform", "translate(0," + height + ")")
-	    .call(xAxis);
-
-	svg.append("g")
-	    .attr("class", "y axis")
-	    .call(yAxis)
-	    .append("text")
-	    .attr("transform", "rotate(-90)")
-	    .attr("y", 6)
-	    .attr("dy", ".71em")
-	    .style("text-anchor", "end")
-	    .text("Score ");
-
-
-	for (i = 0; i < bands.length; i++) {
-	    svg.append("path")
-		.datum(bands[i].values)
-		.attr("class", styles[i])
-		.attr("d", area);
-	}
-
-	var legend = svg.selectAll(".legend")
-	    .data(bands)
-	    .enter()
-	    .append("g")
-	    .attr("class", "legend")
-	    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-	legend.append("rect")
-	    .attr("x", width - 18)
-	    .attr("width", 18)
-	    .attr("height", 18)
-	    .attr("class", function(d) { return styles[d.index];});
-
-	legend.append("text")
-	    .attr("x", width - 24)
-	    .attr("y", 9)
-	    .attr("dy", ".35em")
-	    .style("text-anchor", "end")
-	    .text(function(d) { return d.name;});
-    });
-
-  hide_loading();
-}
-
 
 function view3()
 {
@@ -339,11 +167,12 @@ function view3()
   hide_loading();
 }
 
-
 function view4() //grade timeline
 {
     currentView = 'view4';
   show_loading();
+
+    document.getElementById("sidebar").innerHTML = document.getElementById("sidebar1").innerHTML;
 
   var margin = {top: 20, right: 80, bottom: 30, left: 50},
       width = 900 - margin.left - margin.right,

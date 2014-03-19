@@ -85,6 +85,22 @@ function midterm()
 	.y0(function(d) {return y2(d.low); })
 	.y1(function(d) {return y2(d.high); });
 
+    var MouseOver = function() {
+	var myArea = d3.select(this);
+	myArea.style("opacity", "1");
+
+	myArea.moveToFront();
+    }
+
+    var MouseOut = function() {
+	var myArea = d3.select(this);
+	myArea.style("opacity", "0.5");
+
+	Areas.forEach(function(d) {
+	    d.moveToFront();
+	});
+    }
+
     var svg = d3.select("#canvas").append("svg")
 	.attr("class", "view2")
 	.attr("width", width + margin.left + margin.right)
@@ -220,22 +236,6 @@ function midterm()
 	focus.select(".x.axis").call(xAxis);
     }
     
-    var MouseOver = function() {
-	var myArea = d3.select(this);
-	myArea.style("opacity", "1");
-	
-	myArea.moveToFront();
-    }
-
-    var MouseOut = function() {
-	var myArea = d3.select(this);
-	myArea.style("opacity", "0.5");
-
-	Areas.forEach(function(d) {
-	    d.moveToFront();
-	});
-    }
-
     hide_loading();
 }
 
@@ -412,7 +412,8 @@ function midterm_question()
     function brushing() {
 	x.domain(brush.empty() ? x2.domain() : brush.extent());
 	for (i = 0; i < bands.length; i++) {
-	    rects[i].attr("x", function(d) {return x(d.question);});
+	    rects[i].attr("x", function(d) {return x(d.question);})
+		.attr("width", Math.round(((width - 50)/ (x.domain()[1] - x.domain()[0]))) - 1);
 	}
 	focus.select(".x.axis").call(xAxis);
     }
@@ -450,7 +451,8 @@ function midterm_sbs()
 	.orient("bottom"),
     yAxis = d3.svg.axis()
 	.scale(y)
-	.orient("left");
+	.orient("left")
+	.tickFormat(function(d) {return (d * 100) + "%";});
 
     var brush = d3.svg.brush()
 	.x(x2)
@@ -477,7 +479,7 @@ function midterm_sbs()
 	.attr("class", "context")
 	.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-    var percentiles = [0, 0.5, 1];
+    var percentiles = [0, 0.33, 0.66, 1];
 
     var groupSize = percentiles.length - 1;
 
@@ -499,23 +501,25 @@ function midterm_sbs()
 	for (i = 0; i < num_questions; i++) {
 	    bands[k].values[i] = new Object();
 	    bands[k].values[i].question = i + 1;
-	    bands[k].values[i].y = 0;
+	    bands[k].values[i].correct = 0;
+	    bands[k].values[i].total = 0;
 	}
 
 	for (i = Math.floor(students.length * percentiles[k]); i < Math.floor(students.length * percentiles[k+1]); i++) {
 	    index = 0;
 	    students[i].values.forEach(function(d) {
-		bands[k].values[index].y += d.q_score;
+		bands[k].values[index].correct += d.q_score;
+		bands[k].values[index].total += 1;
 		index += 1;
 	    });
 	}
     }
 
     x.domain([1, 64]);
-    y.domain([0, 30]);
+    y.domain([0, 1]);
 
     x2.domain([1, 64]);
-    y2.domain([0, 30]);
+    y2.domain([0, 1]);
 
     focus.append("g")
 	.attr("class", "x axis")
@@ -530,7 +534,7 @@ function midterm_sbs()
 	.attr("y", 6)
 	.attr("dy", ".71em")
 	.style("text-anchor", "end")
-	.text("Num answered correct ");
+	.text("Percentage correct");
 
     bar_width = Math.round((width / 64)/groupSize);
 
@@ -541,8 +545,8 @@ function midterm_sbs()
 	    .attr("class", styles[i])
 	    .attr("x", function(d) {return x(d.question + i*(1/groupSize));})
 	    .attr("width", bar_width)
-	    .attr("y", function(d) {return y(d.y);})
-	    .attr("height", function(d) {return height - y(d.y); });
+	    .attr("y", function(d) {return y(d.correct/d.total);})
+	    .attr("height", function(d) {return height - y(d.correct/d.total); });
     }
 
     var legend = focus.selectAll(".legend")
@@ -577,8 +581,8 @@ function midterm_sbs()
 	    .attr("class", styles[i])
 	    .attr("x", function(d) {return x2(d.question + i*(1/groupSize));})
 	    .attr("width", bar_width)
-	    .attr("y", function(d) {return y2(d.y);})
-	    .attr("height", function(d) {return height2 - y2(d.y); });
+	    .attr("y", function(d) {return y2(d.correct/d.total);})
+	    .attr("height", function(d) {return height2 - y2(d.correct/d.total); });
     }
     
     context.append("g")

@@ -32,7 +32,12 @@
 
   <td><div id=sidebar2></div></td>
   </tr>
-  <td><div id=instruction class="instruction_box"></div></td>
+  <td>
+    <div id=information>
+      <p><span class=filterlabel>Information</span></p>
+      <div id=instruction class="instruction_box"></div>
+    </div>
+  </td>
   </table>
   </body>
 
@@ -312,10 +317,10 @@
   <p><span class=filterlabel>Percentiles</span><br />
     <input type="checkbox" name="Range_1" value="0" onchange="perc_cbox(this.value, this.checked)" checked>Range 1<br>
     From <select id="range_0_low" onchange="perc_value()">
-      <option value="0" selected="selected">0%</option>
+      <option value="0">0%</option>
       <option value="0.1">10%</option>
       <option value="0.2">20%</option>
-      <option value="0.3">30%</option>
+      <option value="0.3" selected="selected">30%</option>
       <option value="0.4">40%</option>
       <option value="0.5">50%</option>
       <option value="0.6">60%</option>
@@ -327,9 +332,9 @@
       <option value="0">0%</option>
       <option value="0.1">10%</option>
       <option value="0.2">20%</option>
-      <option value="0.3" selected="selected">30%</option>
+      <option value="0.3">30%</option>
       <option value="0.4">40%</option>
-      <option value="0.5">50%</option>
+      <option value="0.5" selected="selected">50%</option>
       <option value="0.6">60%</option>
       <option value="0.7">70%</option>
       <option value="0.8">80%</option>
@@ -341,9 +346,9 @@
       <option value="0">0%</option>
       <option value="0.1">10%</option>
       <option value="0.2">20%</option>
-      <option value="0.3" selected="selected">30%</option>
+      <option value="0.3">30%</option>
       <option value="0.4">40%</option>
-      <option value="0.5">50%</option>
+      <option value="0.5" selected="selected">50%</option>
       <option value="0.6">60%</option>
       <option value="0.7">70%</option>
       <option value="0.8">80%</option>
@@ -356,8 +361,8 @@
       <option value="0.3">30%</option>
       <option value="0.4">40%</option>
       <option value="0.5">50%</option>
-      <option value="0.6" selected="selected">60%</option>
-      <option value="0.7">70%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
       <option value="0.8">80%</option>
       <option value="0.9">90%</option>
       <option value="1">100%</option>
@@ -370,8 +375,8 @@
       <option value="0.3">30%</option>
       <option value="0.4">40%</option>
       <option value="0.5">50%</option>
-      <option value="0.6" selected="selected">60%</option>
-      <option value="0.7">70%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
       <option value="0.8">80%</option>
       <option value="0.9">90%</option>
       <option value="1">100%</option>
@@ -385,8 +390,8 @@
       <option value="0.6">60%</option>
       <option value="0.7">70%</option>
       <option value="0.8">80%</option>
-      <option value="0.9">90%</option>
-      <option value="1" selected="selected">100%</option>
+      <option value="0.9" selected="selected">90%</option>
+      <option value="1">100%</option>
     </select><br>
     <input type="checkbox" name="Range_4" value="3" onchange="perc_cbox(this.value, this.checked)">Range 4<br>
     From <select id="range_3_low" onchange="perc_value()">
@@ -497,15 +502,5 @@
 
 <!-- not displayed instructions -->
 <div id="midterm_instruction" style="display: none;">
-  Midterm<br>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
-  <p>Midterm text</p>
+  
 </div>

@@ -18,7 +18,7 @@
   
   <tr><td id=topbar colspan=2>
 <!--    <div class=view onclick="view1()"> Demographics </div> -->
-    <div class=view onclick="midterm()"> Midterm </div>
+    <div class=view onclick="midterm(true)"> Midterm </div>
     <div class=view onclick="midterm_question()"> Questions </div>
     <div class=view onclick="midterm_sbs()"> SideBySide </div>
     <div class=view onclick="view3()"> Final</div>
@@ -29,9 +29,9 @@
   <tr>
   <td><div id=canvas></div></td>
 
-  <td><div id=sidebar>
-  </div></td>
+  <td><div id=sidebar></div></td>
 
+  <td><div id=sidebar2></div></td>
   </tr></table>
   </body>
 
@@ -84,7 +84,151 @@
 </div>
 
 <div id="midterm_sidebar" style="display: none;">
-  <p><span class=filterlabel>Percentiles</span><br />
-    
+  <p><span class=filterlabel>Views</span><br />
+    <div class=view onclick="midterm(false)">Aggregate</div>
+    <div class=view onclick="midterm_question()">Question</div><br>
   </p>
+  <p><span class=filterlabel>Offering</span><br />
+    <input type="radio" name="offering" value="1">Offering 1
+    <input type="radio" name="offering" value="2">Offering 2<br>
+  </p>
+  <p><span class=filterlabel>Percentiles</span><br />
+    <input type="checkbox" name="Range_1" value="0" onchange="perc_cbox(this.value, this.checked)" checked>Range 1<br>
+    From <select id="range_0_low" onchange="perc_value()">
+      <option value="0" selected="selected">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_0_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_2" value="1" onchange="perc_cbox(this.value, this.checked)" checked>Range 2<br>
+    From <select id="range_1_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_1_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6" selected="selected">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_3" value="2" onchange="perc_cbox(this.value, this.checked)" checked>Range 3<br>
+    From <select id="range_2_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6" selected="selected">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_2_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1" selected="selected">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_4" value="3" onchange="perc_cbox(this.value, this.checked)">Range 4<br>
+    From <select id="range_3_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1" selected="selected">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_3_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+  </p>
+  <p><span class=filterlabel>Demographics</span><br />
+    <div class=view onclick="demog_filter()">Filters</div><br>
+  </p>
+  <p><span class=filterlabel></span><br />
+    <hr>
+    <div class=view onclick="midterm(false)">Submit</div>
+  </p>
+</div>
+
+<div id="demofilter" style="display: none;">
+  <p><span class=filterlabel>Gender</span><br />
+    <input type="checkbox" name="G_Male" checked>Male
+    <input type="checkbox" name="G_Female" checked>Female<br>
+  </p>
+  <p><span class=filterlabel>Age Group</span><br />
+    <input type="checkbox" name="AG_0_10" checked>0-10
+    <input type="checkbox" name="AG_10_20" checked>10-20<br>
+    <input type="checkbox" name="AG_20_30" checked>20-30
+    <input type="checkbox" name="AG_30_40" checked>30-40<br>
+    <input type="checkbox" name="AG_40_50" checked>40-50
+    <input type="checkbox" name="AG_50_60" checked>50-60<br>
+  </p>
+  <p><span class=filterlabel>Country(continent)</span><br />
+    <input type="checkbox" name="C_Africa" checked>Africa
+    <input type="checkbox" name="C_Asia" checked>Asia<br>
+    <input type="checkbox" name="C_Australia" checked>Australia
+    <input type="checkbox" name="C_Europe" checked>Europe<br>
+    <input type="checkbox" name="C_NorthAmerica" checked>North America
+    <input type="checkbox" name="C_SouthAmerica" checked>South America<br>
+  </p>
+  <div class=view onclick="hide()">Hide</div>
+</div>
+<div id="emptybar" style="display: none;">
 </div>

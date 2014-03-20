@@ -69,6 +69,59 @@ td {
   font-size: 120%;
 }
 
+#sidebar .view {
+  float: left;
+  height: 50px;
+  width: 100px;
+  margin: 2px;
+  border: 0px;
+  padding: 0px;
+  background-color: #6baed6;
+  color: blue;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px;
+  cursor: pointer;
+  border-radius:10px;
+}
+
+#sidebar .view:hover {
+  background-color: #3182bd;
+}
+
+#sidebar2 {
+  height: 600px;
+  width: 250px;
+  border-style:solid;
+  border-width: 1px;
+  border-color:#a0a0a0;
+  border-radius:10px;
+  vertical-align:top;
+}
+
+#sidebar2 p .filterlabel {
+  color: #3182bd;
+  text-transform:capitalize;
+  font-variant:small-caps;
+  font-weight:bold;
+  font-size: 120%;
+}
+
+#sidebar2 .view {
+  float: left;
+  height: 50px;
+  width: 100px;
+  margin: 2px;
+  border: 0px;
+  padding: 0px;
+  background-color: #6baed6;
+  color: blue;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px;
+  cursor: pointer;
+  border-radius:10px;
+}
 
 #loadimage {
   position:absolute;
@@ -176,14 +229,8 @@ td {
 }
 
 .area.a4 {
-    fill: orange;
-    opacity: 0.5;
-    clip-path: url('/#clip');
-}
-
-.area.a5 {
     fill: red;
-    opacity: 1;
+    opacity: 0.5;
     clip-path: url('/#clip');
 }
 

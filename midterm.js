@@ -11,9 +11,32 @@ var xAxis, xAxis2, yAxis;
 var students, num_questions;
 var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
 var styles = ["area a1", "area a2", "area a3", "area a4"];
-
+var student_dict = {};
+var demo_Nfields = ["gender"];
+var demo_Qfields = ["age"];
 /* Filters */
 
+var ranges = [{index:0,
+	       visible:true,
+	       low:0,
+	       high:0.33
+	      },
+	      {index:1,
+	       visible:true,
+	       low:0.33,
+	       high:0.66
+	      },
+	      {index:2,
+	       visible:true,
+	       low:0.66,
+	       high:1
+	      },
+	      {index:3,
+	       visible:false,
+	       low:0,
+	       high:0.33
+	      }
+	     ];
 
 /* Initialize student data */
 d3.csv("data/midterm_data.csv", function(error, data) {
@@ -40,14 +63,69 @@ d3.csv("data/midterm_data.csv", function(error, data) {
 
     num_questions = students[0].values.length;
     students.sort(function(a, b) {return a.values[num_questions-1].score - b.values[num_questions-1].score});
+
+    students.forEach(function(d) {
+	student_dict[d.name] = d;
+    });
 });
 
-function midterm()
+d3.csv("data/demographics.csv", function(error, data) {
+    data.forEach(function(d) {
+	st = student_dict[d.id];
+	st.demos = new Object();
+	
+	demo_Nfields.forEach(function(e) {
+	    st.demos[e] = d[e];
+	});
+	demo_Qfields.forEach(function(e) {
+	    st.demos[e] = +d[e];
+	});
+
+    });
+});
+	    
+/* Filter functions */
+
+function perc_cbox(value, checked)
+{
+    ranges[value].visible = checked;
+}
+
+function perc_value()
+{
+    var i;
+    for (i = 0; i < ranges.length; i++) {
+	ranges[i].low = document.getElementById("range_" + i + "_low").value;
+	ranges[i].high = document.getElementById("range_" + i + "_high").value;
+    }
+}
+
+function demog_filter()
+{
+    document.getElementById("sidebar2").innerHTML = document.getElementById("demofilter").innerHTML;
+}
+
+function hide()
+{
+    document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
+}
+
+function midterm_submit()
+{
+    midterm(false);
+}
+
+/* View functions */
+
+function midterm(change_bar)
 {
     currentView = 'midterm';
     show_loading();
 
-    document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
+    if (change_bar)
+	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
+
+    console.log(students);
 
     margin = {top: 20, right: 20, bottom: 150, left: 40};
     margin2 = {top: 480, right: 10, bottom: 20, left: 40};
@@ -130,38 +208,41 @@ function midterm()
 
     var index, i, k;
     var bands = new Array();
-    
-    for (k = 0; k < percentiles.length - 1; k++) {
-	
-	bands[k]= new Object();
 
-	bands[k].name = "band" + k;
-	bands[k].index = k;
-	bands[k].values = new Array();
+    k = 0;
+    ranges.forEach(function(d) {
+	if (d.visible) {
+	    bands[k]= new Object();
 
-	for (i = 0; i < num_questions; i++) {
-	    bands[k].values[i] = new Object();
-	    bands[k].values[i].question = i + 1;
-	    bands[k].values[i].high = 0;
-	    bands[k].values[i].low = Number.MAX_VALUE;
+	    bands[k].name = "band" + k;
+	    bands[k].index = k;
+	    bands[k].values = new Array();
+
+	    for (i = 0; i < num_questions; i++) {
+		bands[k].values[i] = new Object();
+		bands[k].values[i].question = i + 1;
+		bands[k].values[i].high = 0;
+		bands[k].values[i].low = Number.MAX_VALUE;
+	    }
+
+	    for (i = Math.floor(students.length * d.low); i < Math.floor(students.length * d.high); i++) {
+		index = 0;
+		students[i].values.forEach(function(d) {
+		    if (d.score < bands[k].values[index].low)
+			bands[k].values[index].low = d.score;
+		    
+		    if (d.score > bands[k].values[index].high)
+			bands[k].values[index].high = d.score;
+
+		    if (bands[k].values[index].low == bands[k].values[index].high)
+			bands[k].values[index].high += 1;
+
+		    index += 1;
+		});
+	    }
+	    k += 1;
 	}
-
-	for (i = Math.floor(students.length * percentiles[k]); i < Math.floor(students.length * percentiles[k+1]); i++) {
-	    index = 0;
-	    students[i].values.forEach(function(d) {
-		if (d.score < bands[k].values[index].low)
-		    bands[k].values[index].low = d.score;
-		
-		if (d.score > bands[k].values[index].high)
-		    bands[k].values[index].high = d.score;
-
-		if (bands[k].values[index].low == bands[k].values[index].high)
-		    bands[k].values[index].high += 1;
-
-		index += 1;
-	    });
-	}
-    }
+    });
 
     x.domain([1, 64]);
     y.domain([0, 500]);

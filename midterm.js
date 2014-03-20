@@ -12,6 +12,9 @@ var students, num_questions;
 var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
 var styles = ["area a1", "area a2", "area a3", "area a4"];
 
+/* Filters */
+
+
 /* Initialize student data */
 d3.csv("data/midterm_data.csv", function(error, data) {
     var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});

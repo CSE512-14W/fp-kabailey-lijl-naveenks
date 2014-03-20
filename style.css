@@ -41,6 +41,13 @@ td {
   border-radius:10px;
 }
 
+.instruction_box {
+    position:relative;
+    overflow:auto;
+    height: 200px;
+    width: 900px;
+}
+
 #sidebar {
   height: 600px;
   width: 250px;

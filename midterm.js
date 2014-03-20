@@ -10,11 +10,41 @@ var x, s2, y, y2;
 var xAxis, xAxis2, yAxis;
 var students, num_questions;
 var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
-var styles = ["area a1", "area a2", "area a3", "area a4"];
+var styles = ["area a1", "area a2", "area a3", "area a4", "area a5", "area a6"];
 var student_dict = {};
 var demo_Nfields = ["gender"];
 var demo_Qfields = ["age"];
 /* Filters */
+
+var demo_filters = {Male:true,
+		    Female:true,
+		    A0_10:true,
+		    A10_20:true,
+		    A20_30:true,
+		    A30_40:true,
+		    A40_50:true,
+		    A50_60:true
+		   };
+
+var G_demo_filters = [{Male:true,
+		       Female:true,
+		       A0_10:true,
+		       A10_20:true,
+		       A20_30:true,
+		       A30_40:true,
+		       A40_50:true,
+		       A50_60:true
+		      },
+		      {Male:true,
+		       Female:true,
+		       A0_10:true,
+		       A10_20:true,
+		       A20_30:true,
+		       A30_40:true,
+		       A40_50:true,
+		       A50_60:true
+		      }
+		     ];
 
 var ranges = [{index:0,
 	       visible:true,
@@ -37,6 +67,47 @@ var ranges = [{index:0,
 	       high:0.33
 	      }
 	     ];
+
+var G_ranges = [{index:0,
+		 low:0,
+		 high:0.5
+		},
+		{index:1,
+		 low:0.5,
+		 high:1
+		}
+	       ];
+
+var age_groups = [{low:0,
+		   high:10,
+		   name: "A0_10"
+		  },
+		  {low:10,
+		   high:20,
+		   name: "A10_20"
+		  },
+		  {low:20,
+		   high:30,
+		   name: "A20_30"
+		  },
+		  {low:30,
+		   high:40,
+		   name: "A30_40"
+		  },
+		  {low:40,
+		   high:50,
+		   name: "A40_50"
+		  },
+		  {low:50,
+		   high:60,
+		   name: "A50_60"
+		  }];
+
+var genders = ["M", "F"];
+
+var partitioned = "perc";
+
+var partitioned_demo = "gender";
 
 /* Initialize student data */
 d3.csv("data/midterm_data.csv", function(error, data) {
@@ -71,7 +142,7 @@ d3.csv("data/midterm_data.csv", function(error, data) {
 
 d3.csv("data/demographics.csv", function(error, data) {
     data.forEach(function(d) {
-	st = student_dict[d.id];
+	var st = student_dict[d.id];
 	st.demos = new Object();
 	
 	demo_Nfields.forEach(function(e) {
@@ -85,6 +156,81 @@ d3.csv("data/demographics.csv", function(error, data) {
 });
 	    
 /* Filter functions */
+
+function init_filters()
+{
+    demo_filters = {Male:true,
+		    Female:true,
+		    A0_10:true,
+		    A10_20:true,
+		    A20_30:true,
+		    A30_40:true,
+		    A40_50:true,
+		    A50_60:true
+		   };
+
+    ranges = [{index:0,
+	       visible:true,
+	       low:0,
+	       high:0.33
+	      },
+	      {index:1,
+	       visible:true,
+	       low:0.33,
+	       high:0.66
+	      },
+	      {index:2,
+	       visible:true,
+	       low:0.66,
+	       high:1
+	      },
+	      {index:3,
+	       visible:false,
+	       low:0,
+	       high:0.33
+	      }
+	     ];
+
+    G_ranges = [{index:0,
+		 low:0,
+		 high:0.5
+		},
+		{index:1,
+		 low:0.5,
+		 high:1
+		}
+	       ];
+
+    G_demo_filters = [{Male:true,
+		       Female:true,
+		       A0_10:true,
+		       A10_20:true,
+		       A20_30:true,
+		       A30_40:true,
+		       A40_50:true,
+		       A50_60:true
+		      },
+		      {Male:true,
+		       Female:true,
+		       A0_10:true,
+		       A10_20:true,
+		       A20_30:true,
+		       A30_40:true,
+		       A40_50:true,
+		       A50_60:true
+		      }
+		     ];
+    
+    partitioned = "perc";
+}
+
+function G_perc_value()
+{
+    G_ranges[0].low = document.getElementById("range_G1_low").value;
+    G_ranges[0].high = document.getElementById("range_G1_high").value;
+    G_ranges[1].low = document.getElementById("range_G2_low").value;
+    G_ranges[1].high = document.getElementById("range_G2_high").value;
+}
 
 function perc_cbox(value, checked)
 {
@@ -105,14 +251,77 @@ function demog_filter()
     document.getElementById("sidebar2").innerHTML = document.getElementById("demofilter").innerHTML;
 }
 
-function hide()
+function G_demog_filter()
 {
-    document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
+    document.getElementById("sidebar2").innerHTML = document.getElementById("G_demofilter").innerHTML;
 }
 
-function midterm_submit()
+function demo_cb()
 {
-    midterm(false);
+    demo_filters.Male = document.getElementById("G_Male").checked;
+    demo_filters.Female = document.getElementById("G_Female").checked;
+    
+    demo_filters.A0_10 = document.getElementById("AG_0_10").checked;
+    demo_filters.A10_20 = document.getElementById("AG_10_20").checked;
+    demo_filters.A20_30 = document.getElementById("AG_20_30").checked;
+    demo_filters.A30_40 = document.getElementById("AG_30_40").checked;
+    demo_filters.A40_50 = document.getElementById("AG_40_50").checked;
+    demo_filters.A50_60 = document.getElementById("AG_50_60").checked;
+}
+
+function G_demo_cb()
+{
+    var i;
+    for (i = 0; i < 2; i++) {
+	G_demo_filters[i].Male = document.getElementById("G" + i + "_Male").checked;
+	G_demo_filters[i].Female = document.getElementById("G" + i + "_Female").checked;
+	
+	G_demo_filters[i].A0_10 = document.getElementById("AG" + i + "_0_10").checked;
+	G_demo_filters[i].A10_20 = document.getElementById("AG" + i + "_10_20").checked;
+	G_demo_filters[i].A20_30 = document.getElementById("AG" + i + "_20_30").checked;
+	G_demo_filters[i].A30_40 = document.getElementById("AG" + i + "_30_40").checked;
+	G_demo_filters[i].A40_50 = document.getElementById("AG" + i + "_40_50").checked;
+	G_demo_filters[i].A50_60 = document.getElementById("AG" + i + "_50_60").checked;
+    }
+}
+
+
+function partition() {
+    if (document.getElementById("partition_perc").checked) {
+	partitioned = "perc";
+    } else if (document.getElementById("partition_demo").checked) {
+	partitioned = "demo";
+    }
+
+    switch (document.getElementById("question_demo").value) {
+    case "1":
+	partitioned_demo = "gender";
+	break;
+    case "2":
+	partitioned_demo = "age";
+	break;
+    default:
+	partitioned_demo = "gender";
+    }
+}
+
+function filter_demo(student, d_filters) {
+    /* Gender */
+    if (student.demos.gender == "M" && d_filters.Male == false)
+	return false;
+    if (student.demos.gender == "F" && d_filters.Female == false)
+	return false;
+
+    /* Age group */
+    var i;
+    for (i = 0; i < age_groups.length; i++) {
+	if (student.demos.age >= age_groups[i].low && student.demos.age < age_groups[i].high) {
+	    if (d_filters[age_groups[i].name] == false)
+		return false;
+	}
+    }
+    
+    return true;
 }
 
 /* View functions */
@@ -122,10 +331,12 @@ function midterm(change_bar)
     currentView = 'midterm';
     show_loading();
 
-    if (change_bar)
+    if (change_bar) {
 	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
+	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
 
-    console.log(students);
+	init_filters();
+    }
 
     margin = {top: 20, right: 20, bottom: 150, left: 40};
     margin2 = {top: 480, right: 10, bottom: 20, left: 40};
@@ -202,8 +413,6 @@ function midterm(change_bar)
 	.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 
-    var percentiles = [0, 0.33, 0.66, 1];
-    
     var Areas = new Array();
 
     var index, i, k;
@@ -227,18 +436,20 @@ function midterm(change_bar)
 
 	    for (i = Math.floor(students.length * d.low); i < Math.floor(students.length * d.high); i++) {
 		index = 0;
-		students[i].values.forEach(function(d) {
-		    if (d.score < bands[k].values[index].low)
-			bands[k].values[index].low = d.score;
-		    
-		    if (d.score > bands[k].values[index].high)
-			bands[k].values[index].high = d.score;
+		if (filter_demo(students[i], demo_filters)) {
+		    students[i].values.forEach(function(d) {
+			if (d.score < bands[k].values[index].low)
+			    bands[k].values[index].low = d.score;
+			
+			if (d.score > bands[k].values[index].high)
+			    bands[k].values[index].high = d.score;
 
-		    if (bands[k].values[index].low == bands[k].values[index].high)
-			bands[k].values[index].high += 1;
+			if (bands[k].values[index].low == bands[k].values[index].high)
+			    bands[k].values[index].high += 1;
 
-		    index += 1;
-		});
+			index += 1;
+		    });
+		}
 	    }
 	    k += 1;
 	}
@@ -323,12 +534,17 @@ function midterm(change_bar)
     hide_loading();
 }
 
-function midterm_question()
+function midterm_question(change_bar)
 {
     currentView = 'midterm_question';
     show_loading();
     
-    document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
+    if (change_bar) {
+	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_question_sidebar").innerHTML;
+	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
+
+	init_filters();
+    }
 
     var margin = {top: 20, right: 30, bottom: 150, left: 20},
     margin2 = {top: 460, right: 30, bottom: 40, left: 20},
@@ -380,40 +596,101 @@ function midterm_question()
 	.attr("class", "context")
 	.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-    var percentiles = [0, 0.33, 0.66, 1];
-
     var rects = new Array();
     
     var Bars = new Array();
 
     var bands = new Array();
 
-    var index, i, k;
+    var index, i, j,k;
 
-    for (k = 0; k < percentiles.length - 1; k++) {	    
-	bands[k]= new Object();
+    k = 0;
+    if (partitioned == "perc") {
+	ranges.forEach(function(d) {
+	    if (d.visible) {
+		bands[k]= new Object();
 
-	bands[k].name = "band" + k;
-	bands[k].index = k;
-	bands[k].values = new Array();
+		bands[k].name = "band" + k;
+		bands[k].index = k;
+		bands[k].values = new Array();
 
-	for (i = 0; i < num_questions; i++) {
-	    bands[k].values[i] = new Object();
-	    bands[k].values[i].question = i + 1;
-	    if (k == 0) {
-		bands[k].values[i].y0 = 0;
-	    } else {
-		bands[k].values[i].y0 = bands[k-1].values[i].y1;
+		for (i = 0; i < num_questions; i++) {
+		    bands[k].values[i] = new Object();
+		    bands[k].values[i].question = i + 1;
+		    if (k == 0) {
+			bands[k].values[i].y0 = 0;
+		    } else {
+			bands[k].values[i].y0 = bands[k-1].values[i].y1;
+		    }
+		    bands[k].values[i].y1 = bands[k].values[i].y0;
+		}
+
+		for (i = Math.floor(students.length * d.low); i < Math.floor(students.length * d.high); i++) {
+		    index = 0;
+		    students[i].values.forEach(function(d) {
+			bands[k].values[index].y1 += d.q_score;
+			index += 1;
+		    });
+		}
+		k += 1;
 	    }
-	    bands[k].values[i].y1 = bands[k].values[i].y0;
+	});
+    } else if (partitioned == "demo") {
+	var demos;
+	switch (partitioned_demo) {
+	case "gender":
+	    demos = genders;
+	    break;
+	case "age":
+	    demos = age_groups;
+	    break;
+	default:
+	    demos = genders;
 	}
 
-	for (i = Math.floor(students.length * percentiles[k]); i < Math.floor(students.length * percentiles[k+1]); i++) {
+	for (i = 0; i < demos.length; i++) {
+	    bands[i] = new Object();
+
+	    bands[i].name = "band" + i;
+	    bands[i].index = i;
+	    bands[i].values = new Array();
+
+	    for (j = 0; j < num_questions; j++) {
+		bands[i].values[j] = new Object();
+		bands[i].values[j].question = j + 1;
+		bands[i].values[j].y0 = 0;
+		bands[i].values[j].y1 = 0;
+	    }
+	}
+	
+	students.forEach(function(s) {
+	    if (partitioned_demo == "gender") {
+		if (s.demos.gender == "M")
+		    k = 0;
+		else if (s.demos.gender == "F")
+		    k = 1;
+	    } else if (partitioned_demo == "age") {
+		for (j = 0; j < age_groups.length; j++) {
+		    if (s.demos.age >= age_groups[j].low && s.demos.age < age_groups[j].high) {
+			k = j;
+			break;
+		    }
+		}
+	    }
 	    index = 0;
-	    students[i].values.forEach(function(d) {
+	    s.values.forEach(function(d) {
 		bands[k].values[index].y1 += d.q_score;
 		index += 1;
 	    });
+	});
+	
+	for (i = 0; i < bands.length; i++) {
+	    for (j = 0; j < num_questions; j++) {
+		if (i != 0) {
+		    bands[i].values[j].y0 = bands[i-1].values[j].y1;
+		    bands[i].values[j].y1 += bands[i].values[j].y0;
+		}
+	    }
 	}
     }
 
@@ -505,12 +782,16 @@ function midterm_question()
     hide_loading();
 }
 
-function midterm_sbs()
+function midterm_sbs(change_bar)
 {
     currentView = 'midterm_question';
     show_loading();
     
-    document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
+    if (change_bar) {
+	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_compare").innerHTML;
+	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
+	init_filters();
+    }
 
     var margin = {top: 20, right: 30, bottom: 150, left: 20},
     margin2 = {top: 460, right: 30, bottom: 40, left: 20},
@@ -563,9 +844,7 @@ function midterm_sbs()
 	.attr("class", "context")
 	.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-    var percentiles = [0, 0.33, 0.66, 1];
-
-    var groupSize = percentiles.length - 1;
+    var groupSize = 2;
 
     var rects = new Array();
     
@@ -573,29 +852,31 @@ function midterm_sbs()
 
     var bands = new Array();
 
-    var index, i, k, bar_width;
+    var index, i, j, k, bar_width;
 
-    for (k = 0; k < percentiles.length - 1; k++) {	    
-	bands[k]= new Object();
+    for (i = 0; i < 2; i++) {
+	bands[i]= new Object();
 
-	bands[k].name = "band" + k;
-	bands[k].index = k;
-	bands[k].values = new Array();
+	bands[i].name = "band" + i;
+	bands[i].index = i;
+	bands[i].values = new Array();
 
-	for (i = 0; i < num_questions; i++) {
-	    bands[k].values[i] = new Object();
-	    bands[k].values[i].question = i + 1;
-	    bands[k].values[i].correct = 0;
-	    bands[k].values[i].total = 0;
+	for (j = 0; j < num_questions; j++) {
+	    bands[i].values[j] = new Object();
+	    bands[i].values[j].question = j + 1;
+	    bands[i].values[j].correct = 0;
+	    bands[i].values[j].total = 0;
 	}
 
-	for (i = Math.floor(students.length * percentiles[k]); i < Math.floor(students.length * percentiles[k+1]); i++) {
+	for (k = Math.floor(students.length * G_ranges[i].low); k < Math.floor(students.length * G_ranges[i].high); k++) {
 	    index = 0;
-	    students[i].values.forEach(function(d) {
-		bands[k].values[index].correct += d.q_score;
-		bands[k].values[index].total += 1;
-		index += 1;
-	    });
+	    if (filter_demo(students[k], G_demo_filters[i])) {
+		students[k].values.forEach(function(d) {
+		    bands[i].values[index].correct += d.q_score;
+		    bands[i].values[index].total += 1;
+		    index += 1;
+		});
+	    }
 	}
     }
 

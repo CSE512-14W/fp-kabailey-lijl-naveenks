@@ -331,6 +331,8 @@ function midterm(change_bar)
     currentView = 'midterm';
     show_loading();
 
+    fill_instruction("midterm_instruction");
+
     if (change_bar) {
 	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
 	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;

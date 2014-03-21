@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Exploring MOOC Data</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="d3/d3.v3.min.js"></script>
+    <script type="text/javascript" src="d3/datamaps.all.min.js"></script>
+    <script type="text/javascript" src="d3/topojson.v1.min.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="utilities.js"></script>
+    <script type="text/javascript" src="midterm.js"></script>
+    <script type="text/javascript" src="aggregate.js"></script>
+    <script type="text/javascript" src="timescales.js"></script>
+  </head>
+
+  <body>
+  <h1 align=center>Visualizing Data from a MOOC</h1>
+
+  <table id=container>
+  
+  <tr><td id=topbar colspan=2>
+    <div class=view onclick="view1()"> Demographics </div>
+    <div class=view onclick="aggregate(true)"> Assignments</div>
+    <div class=view onclick="hwtimescales(true)"> Timestamps</div>
+    <div class=view onclick="midterm(true, 0)"> Midterm </div>
+    <div class=view onclick="midterm(true, 1)"> Final</div>
+<!--     <div class=view onclick="view5()"> Impact</div> -->
+  </td></tr>
+
+  <tr>
+  <td><div id=canvas>
+
+  <p style="margin:30px">
+ Use the tabs above to switch between different views that zoom in on various views of the data for your course. Sidebars and explanations will pop up as you explore the interface. </br></br>
+ Demographics show you a quick overview of the breakdown in age, gender, agegroup, and background</br>
+ Assignments shows you the average grades for students, as clustered by our software, isolating trends in dropoff and performance</br>
+ Timestamps shows the impact of submission time on the grade for an assignment  </br>
+Midterm and Final zoom in on the details of a specific exam, allowing you to take a more detailed view and comparsion.
+ <br><br>
+We hope you find the information useful!
+</p>
+
+  </div></td>
+
+  <td><div id=sidebar></div></td>
+
+  <td><div id=sidebar2></div></td>
+  </tr>
+  <td>
+    <div id=information>
+      <p><span class=filterlabel>Information</span></p>
+      <div id=instruction class="instruction_box"></div>
+    </div>
+  </td>
+  </table>
+  </body>
+
+</html>
+
+<!--  not displayed side bars for each view -->
+<div id="timestamps" style="display: none;">
+  <p><span class=filterlabel>Display Course Offering</span><br />
+    <select id="t_offering" onchange="tswitchoffer(this.value)">
+    <option value="1">Offering 001</option>
+    <option value="2">Offering 002</option>
+    </select> <br/>
+  </p>
+
+  <p><span class=filterlabel>View Assignment</span><br />
+    <select id="t_display" onchange="tswitchassign(this.value)">
+      <option value="1">Assignment 1</option>
+      <option value="2">Assignment 2</option>
+      <option value="3">Assignment 3</option>
+      <option value="5">Assignment 4</option>
+      <option value="6">Assignment 5</option>
+      <option value="7">Assignment 6</option>
+    </select> <br/>
+  </p>
+
+<!--  <p><span class=filterlabel>Color Display By</span><br />
+    <select id="t_display" onchange="tswitchcolor(this.value)">
+      <option value="0" id="c1" >None</option>
+      <option value="1" id="c2" >Gender</option>
+      <option value="2" id="c3" >AgeGroup</option>
+      <option value="3" id="c4" >Background</option>
+      <option value="4" id="c5" >Continent</option>
+    </select><br/>
+  </p> -->
+
+</div>
+
+<div id="allgrades" style="display: none;">
+ <p><span class=filterlabel>Display Course Offering</span><br />
+    <select id="a_offering" onchange="switchoffer(this.value)">
+    <option value="1">Offering 001</option>
+    <option value="2">Offering 002</option>
+    </select> <br/>
+  </p>
+
+  <p><span class=filterlabel>Include Assignments</span><br />
+      <input type="checkbox" name="box1" onchange="checkbox1(this.checked)" checked>Assignment 1</br>
+      <input type="checkbox" name="box2" onchange="checkbox2(this.checked)" checked>Assignment 2</br>
+      <input type="checkbox" name="box3" onchange="checkbox3(this.checked)" checked>Assignment 3</br>
+      <input type="checkbox" name="box4" onchange="checkbox4(this.checked)" checked>Assignment 4</br>
+      <input type="checkbox" name="box5" onchange="checkbox5(this.checked)" checked>Assignment 5</br>
+      <input type="checkbox" name="box6" onchange="checkbox6(this.checked)" checked>Assignment 6</br>
+  </p>
+
+  <p><span class=filterlabel> Display How Many Clusters?</span><br />
+    <select id="cluster_display" onchange="switchclusters(this.value)">
+      <option value="0">Individual Data</option>
+      <option value="1">1 Cluster (avg)</option>
+      <option value="2">2 Clusters</option>
+      <option value="4">4 Clusters</option>
+      <option value="8">8 Clusters</option>
+    </select>
+  </p>
+</div>
+
+<!-- Midterm side bars -->
+<div id="midterm_question_sidebar" style="display: none;">
+  <p><span class=filterlabel>Views</span><br />
+    <div class=view onclick="midterm(true, 0)">Aggregate</div>
+    <div class=view onclick="midterm_question(false, 0)">Question</div><br>
+  </p>
+  <p><span class=filterlabel>Offering</span><br />
+    <input type="radio" name="offering" value="1" onchange="f_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offering" value="2" onchange="f_offering(this.value)">Offering 2<br>
+  </p>
+  <p><span class=filterlabel>Partitioned By</span><br />
+    <input type="radio" name="partition" value="1" id="partition_perc" onchange="partition()" checked>Percentiles<br>
+    <input type="checkbox" name="Range_1" value="0" onchange="perc_cbox(this.value, this.checked)" checked>Range 1<br>
+    From <select id="range_0_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_0_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_2" value="1" onchange="perc_cbox(this.value, this.checked)" checked>Range 2<br>
+    From <select id="range_1_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_1_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_3" value="2" onchange="perc_cbox(this.value, this.checked)" checked>Range 3<br>
+    From <select id="range_2_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_2_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9" selected="selected">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_4" value="3" onchange="perc_cbox(this.value, this.checked)">Range 4<br>
+    From <select id="range_3_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1" selected="selected">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_3_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+  </p>
+  <p><span class=filterlabel>Or</span><br />
+    <input type="radio" name="partition" value="2" id="partition_demo" onchange="partition()">Demographics<br>
+    <select id="question_demo" onchange="partition()">
+      <option value="0">Select</option>
+      <option value="1">Gender</option>
+      <option value="2">Age</option>
+      <option value="3">Country</option>
+    </select>
+    <div class=view onclick="midterm_question(false, 0)">Submit</div>
+    <div class=view2 onclick="midterm_sbs(true, 0)">CompareView</div>
+  </p>
+</div>
+
+<div id="midterm_compare" style="display: none;">
+  <p><span class=filterlabel>Views</span><br />
+    <div class=view onclick="midterm(true, 0)">Aggregate</div>
+    <div class=view onclick="midterm_question(true, 0)">Question</div><br>
+  </p>
+  <p><span class=filterlabel>Group 1</span><br />
+    <p>
+    <input type="radio" name="offeringG1" value="1" onchange="g1_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offeringG1" value="2" onchange="g1_offering(this.value)">Offering 2<br>
+    </p>
+  <p>
+    Percentiles<br>
+  </p>
+  <p>
+    From <select id="range_G1_low" onchange="G_perc_value()">
+      <option value="0" selected="selected">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_G1_high" onchange="G_perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>    
+  </p>
+  <p><span class=filterlabel>Group 2</span><br />
+    <p>
+    <input type="radio" name="offeringG2" value="1" onchange="g2_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offeringG2" value="2" onchange="g2_offering(this.value)">Offering 2<br>
+    </p>
+  <p>
+    Percentiles<br>
+  </p>
+  <p>
+    From <select id="range_G2_low" onchange="G_perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_G2_high" onchange="G_perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1" selected="selected">100%</option>
+    </select><br>    
+  </p>
+  <p>
+    <hr>
+  </p>
+  <p><span class=filterlabel>Demographics</span><br />
+    <div class=view onclick="G_demog_filter()">Filters</div><br>
+  </p>
+  <p><span class=filterlabel></span><br />
+    <div class=view onclick="midterm_sbs(false, 0)">Submit</div>
+    <div class=view2 onclick="midterm_question(true, 0)">QuestionView</div>
+  </p>
+</div>
+
+<div id="midterm_sidebar" style="display: none;">
+  <p><span class=filterlabel>Views</span><br />
+    <div class=view onclick="midterm(false, 0)">Aggregate</div>
+    <div class=view onclick="midterm_question(true, 0)">Question</div><br>
+  </p>
+  <p><span class=filterlabel>Offering</span><br />
+    <input type="radio" name="offering" value="1" onchange="f_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offering" value="2" onchange="f_offering(this.value)">Offering 2<br>
+  </p>
+  <p><span class=filterlabel>Percentiles</span><br />
+    <input type="checkbox" name="Range_1" value="0" onchange="perc_cbox(this.value, this.checked)" checked>Range 1<br>
+    From <select id="range_0_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_0_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_2" value="1" onchange="perc_cbox(this.value, this.checked)" checked>Range 2<br>
+    From <select id="range_1_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_1_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_3" value="2" onchange="perc_cbox(this.value, this.checked)" checked>Range 3<br>
+    From <select id="range_2_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_2_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9" selected="selected">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_4" value="3" onchange="perc_cbox(this.value, this.checked)">Range 4<br>
+    From <select id="range_3_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1" selected="selected">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_3_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+  </p>
+  <p><span class=filterlabel>Demographics</span><br />
+    <div class=view onclick="demog_filter()">Filters</div><br>
+  </p>
+  <p><span class=filterlabel></span><br />
+    <hr>
+    <div class=view onclick="midterm(false, 0)">Submit</div>
+  </p>
+</div>
+
+<!-- Final sidebars -->
+<div id="final_question_sidebar" style="display: none;">
+  <p><span class=filterlabel>Views</span><br />
+    <div class=view onclick="midterm(true, 1)">Aggregate</div>
+    <div class=view onclick="midterm_question(false, 1)">Question</div><br>
+  </p>
+  <p><span class=filterlabel>Offering</span><br />
+    <input type="radio" name="offering" value="1" onchange="f_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offering" value="2" onchange="f_offering(this.value)">Offering 2<br>
+  </p>
+  <p><span class=filterlabel>Partitioned By</span><br />
+    <input type="radio" name="partition" value="1" id="partition_perc" onchange="partition()" checked>Percentiles<br>
+    <input type="checkbox" name="Range_1" value="0" onchange="perc_cbox(this.value, this.checked)" checked>Range 1<br>
+    From <select id="range_0_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_0_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_2" value="1" onchange="perc_cbox(this.value, this.checked)" checked>Range 2<br>
+    From <select id="range_1_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_1_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_3" value="2" onchange="perc_cbox(this.value, this.checked)" checked>Range 3<br>
+    From <select id="range_2_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_2_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9" selected="selected">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_4" value="3" onchange="perc_cbox(this.value, this.checked)">Range 4<br>
+    From <select id="range_3_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1" selected="selected">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_3_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+  </p>
+  <p><span class=filterlabel>Or</span><br />
+    <input type="radio" name="partition" value="2" id="partition_demo" onchange="partition()">Demographics<br>
+    <select id="question_demo" onchange="partition()">
+      <option value="0">Select</option>
+      <option value="1">Gender</option>
+      <option value="2">Age</option>
+      <option value="3">Country</option>
+    </select>
+    <div class=view onclick="midterm_question(false, 1)">Submit</div>
+    <div class=view2 onclick="midterm_sbs(true, 1)">CompareView</div>
+  </p>
+</div>
+
+<div id="final_compare" style="display: none;">
+  <p><span class=filterlabel>Views</span><br />
+    <div class=view onclick="midterm(true, 1)">Aggregate</div>
+    <div class=view onclick="midterm_question(true, 1)">Question</div><br>
+  </p>
+  <p><span class=filterlabel>Group 1</span><br />
+    <p>
+    <input type="radio" name="offeringG1" value="1" onchange="g1_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offeringG1" value="2" onchange="g1_offering(this.value)">Offering 2<br>
+    </p>
+  <p>
+    Percentiles<br>
+  </p>
+  <p>
+    From <select id="range_G1_low" onchange="G_perc_value()">
+      <option value="0" selected="selected">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_G1_high" onchange="G_perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>    
+  </p>
+  <p><span class=filterlabel>Group 2</span><br />
+    <p>
+    <input type="radio" name="offeringG2" value="1" onchange="g2_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offeringG2" value="2" onchange="g2_offering(this.value)">Offering 2<br>
+    </p>
+  <p>
+    Percentiles<br>
+  </p>
+  <p>
+    From <select id="range_G2_low" onchange="G_perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_G2_high" onchange="G_perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1" selected="selected">100%</option>
+    </select><br>    
+  </p>
+  <p>
+    <hr>
+  </p>
+  <p><span class=filterlabel>Demographics</span><br />
+    <div class=view onclick="G_demog_filter()">Filters</div><br>
+  </p>
+  <p><span class=filterlabel></span><br />
+    <div class=view onclick="midterm_sbs(false, 1)">Submit</div>
+    <div class=view2 onclick="midterm_question(true, 1)">QuestionView</div>
+  </p>
+</div>
+
+<div id="final_sidebar" style="display: none;">
+  <p><span class=filterlabel>Views</span><br />
+    <div class=view onclick="midterm(false, 1)">Aggregate</div>
+    <div class=view onclick="midterm_question(true, 1)">Question</div><br>
+  </p>
+  <p><span class=filterlabel>Offering</span><br />
+    <input type="radio" name="offering" value="1" onchange="f_offering(this.value)" checked>Offering 1
+    <input type="radio" name="offering" value="2" onchange="f_offering(this.value)">Offering 2<br>
+  </p>
+  <p><span class=filterlabel>Percentiles</span><br />
+    <input type="checkbox" name="Range_1" value="0" onchange="perc_cbox(this.value, this.checked)" checked>Range 1<br>
+    From <select id="range_0_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_0_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_2" value="1" onchange="perc_cbox(this.value, this.checked)" checked>Range 2<br>
+    From <select id="range_1_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5" selected="selected">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_1_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_3" value="2" onchange="perc_cbox(this.value, this.checked)" checked>Range 3<br>
+    From <select id="range_2_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7" selected="selected">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_2_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9" selected="selected">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+    <input type="checkbox" name="Range_4" value="3" onchange="perc_cbox(this.value, this.checked)">Range 4<br>
+    From <select id="range_3_low" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1" selected="selected">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select> To <select id="range_3_high" onchange="perc_value()">
+      <option value="0">0%</option>
+      <option value="0.1">10%</option>
+      <option value="0.2">20%</option>
+      <option value="0.3" selected="selected">30%</option>
+      <option value="0.4">40%</option>
+      <option value="0.5">50%</option>
+      <option value="0.6">60%</option>
+      <option value="0.7">70%</option>
+      <option value="0.8">80%</option>
+      <option value="0.9">90%</option>
+      <option value="1">100%</option>
+    </select><br>
+  </p>
+  <p><span class=filterlabel>Demographics</span><br />
+    <div class=view onclick="demog_filter()">Filters</div><br>
+  </p>
+  <p><span class=filterlabel></span><br />
+    <hr>
+    <div class=view onclick="midterm(false, 1)">Submit</div>
+  </p>
+</div>
+
+
+<!-- Filter sidebars -->
+<div id="demofilter" style="display: none;">
+  <p><span class=filterlabel>Gender</span><br />
+    <input type="checkbox" id="G_Male" onchange="demo_cb()" checked>Male
+    <input type="checkbox" id="G_Female" onchange="demo_cb()" checked>Female<br>
+  </p>
+  <p><span class=filterlabel>Age Group</span><br />
+    <input type="checkbox" id="AG_0_10" onchange="demo_cb()" checked>0-18
+    <input type="checkbox" id="AG_10_20" onchange="demo_cb()" checked>18-25<br>
+    <input type="checkbox" id="AG_20_30" onchange="demo_cb()" checked>25-35
+    <input type="checkbox" id="AG_30_40" onchange="demo_cb()" checked>35-45<br>
+    <input type="checkbox" id="AG_40_50" onchange="demo_cb()" checked>45-55
+    <input type="checkbox" id="AG_50_60" onchange="demo_cb()" checked>55+<br>
+  </p>
+  <p><span class=filterlabel>Country(continent)</span><br />
+    <input type="checkbox" id="C_Africa" onchange="demo_cb()" checked>Africa
+    <input type="checkbox" id="C_Asia" onchange="demo_cb()" checked>Asia<br>
+    <input type="checkbox" id="C_Australia" onchange="demo_cb()" checked>Australia
+    <input type="checkbox" id="C_Europe" onchange="demo_cb()" checked>Europe<br>
+    <input type="checkbox" id="C_NorthAmerica" onchange="demo_cb()" checked>North America
+    <input type="checkbox" id="C_SouthAmerica" onchange="demo_cb()" checked>South America
+    <input type="checkbox" id="C_Unknown" onchange="demo_cb()" checked>Unidentified<br>
+  </p>
+</div>
+
+<div id="G_demofilter" style="display: none;">
+  <p><span class=filterlabel>Group 1: Gender</span><br />
+    <input type="checkbox" id="G0_Male" onchange="G_demo_cb()" checked>Male
+    <input type="checkbox" id="G0_Female" onchange="G_demo_cb()" checked>Female<br>
+  </p>
+  <p><span class=filterlabel>Age Group</span><br />
+    <input type="checkbox" id="AG0_0_10" onchange="G_demo_cb()" checked>0-18
+    <input type="checkbox" id="AG0_10_20" onchange="G_demo_cb()" checked>18-25<br>
+    <input type="checkbox" id="AG0_20_30" onchange="G_demo_cb()" checked>25-35
+    <input type="checkbox" id="AG0_30_40" onchange="G_demo_cb()" checked>35-45<br>
+    <input type="checkbox" id="AG0_40_50" onchange="G_demo_cb()" checked>45-55
+    <input type="checkbox" id="AG0_50_60" onchange="G_demo_cb()" checked>55+<br>
+  </p>
+  <p><span class=filterlabel>Country(continent)</span><br />
+    <input type="checkbox" id="CG0_Africa" onchange="G_demo_cb()" checked>Africa
+    <input type="checkbox" id="CG0_Asia" onchange="G_demo_cb()" checked>Asia<br>
+    <input type="checkbox" id="CG0_Australia" onchange="G_demo_cb()" checked>Australia
+    <input type="checkbox" id="CG0_Europe" onchange="G_demo_cb()" checked>Europe<br>
+    <input type="checkbox" id="CG0_NorthAmerica" onchange="G_demo_cb()" checked>North America
+    <input type="checkbox" id="CG0_SouthAmerica" onchange="G_demo_cb()" checked>South America
+    <input type="checkbox" id="CG0_Unknown" onchange="G_demo_cb()" checked>Unidentified<br>
+    <hr>
+  </p>
+
+  <p><span class=filterlabel>Group 2: Gender</span><br />
+    <input type="checkbox" id="G1_Male" onchange="demo_cb()" checked>Male
+    <input type="checkbox" id="G1_Female" onchange="demo_cb()" checked>Female<br>
+  </p>
+  <p><span class=filterlabel>Age Group</span><br />
+    <input type="checkbox" id="AG1_0_10" onchange="G_demo_cb()" checked>0-18
+    <input type="checkbox" id="AG1_10_20" onchange="G_demo_cb()" checked>18-25<br>
+    <input type="checkbox" id="AG1_20_30" onchange="G_demo_cb()" checked>25-35
+    <input type="checkbox" id="AG1_30_40" onchange="G_demo_cb()" checked>35-45<br>
+    <input type="checkbox" id="AG1_40_50" onchange="G_demo_cb()" checked>45-55
+    <input type="checkbox" id="AG1_50_60" onchange="G_demo_cb()" checked>55+<br>
+  </p>
+  <p><span class=filterlabel>Country(continent)</span><br />
+    <input type="checkbox" id="CG1_Africa" onchange="G_demo_cb()" checked>Africa
+    <input type="checkbox" id="CG1_Asia" onchange="G_demo_cb()" checked>Asia<br>
+    <input type="checkbox" id="CG1_Australia" onchange="G_demo_cb()" checked>Australia
+    <input type="checkbox" id="CG1_Europe" onchange="G_demo_cb()" checked>Europe<br>
+    <input type="checkbox" id="CG1_NorthAmerica" onchange="G_demo_cb()" checked>North America
+    <input type="checkbox" id="CG1_SouthAmerica" onchange="G_demo_cb()" checked>South America
+    <input type="checkbox" id="CG1_Unknown" onchange="G_demo_cb()" checked>Unidentified<br>
+  </p>
+
+</div>
+
+<div id="emptybar" style="display: none;">
+
+<!-- not displayed instructions -->
+<div id="empty_instruction" style="display: none;"></div>
+
+<div id="midterm_instruction" style="display: none;">
+  This is the midterm panel. You can switch between aggregate view and per question view by clicking the corresponding view button.
+  <p>You are currently in the aggregate view. The x-axis is the question number and the y-axis is the cumulative score. Each band shows the score range of certain group of students. Students are grouped by percentiles of their total midterm score. This view shows general trends of students: steeper slope shows better understandings of the topic, while flatter slope indicates common misunderstandings.</p>
+  <p>You can zoom in on a smaller set of questions by using the brushing tool in the secondary region.</p>
+  <p>You can highlight a certain band by hovering the mouse over a particular band. Switching between the two offerings is done by clicking one of the offering radio button. You can display upto 4 bands by selecting the checkboxes, and selecting the ranges of percentiles.</p>
+  <p>Demographic data can be filtered by clicking the "Filters" button. It will toggle a new side panel in which you can select all the demographic options.</p>
+  <p>Click the "Submit" button to reflect all the changes.</p>
+</div>
+
+<div id="midterm_question_instruction" style="display: none;">
+  This is the midterm panel. You can switch between aggregate view and per question view by clicking the corresponding view button.
+  <p>You are currently in the per question view. The x-axis is the question number and the y-axis is the number of students that answered correctly. The view makes it easy to see which questions students were better at. It also displays the distribution of scores. The bars can be partitioned by either ranges of percentiles, or demographics. You can pick one of the two by clicking the radio button, and select the corresponding options.</p>
+  <p>You can zoom in on a smaller set of questions by using the brushing tool in the secondary region.</p>
+  <p>Click the "Submit" button to reflect all the changes.</p>
+  <p>Click the "CompareView" button to enter the comparison view. </p>
+</div>
+
+<div id="midterm_compare_instruction" style="display: none;">
+  This is the midterm panel. You can switch between aggregate view and per question view by clicking the corresponding view button.
+  <p>You are currently in the comparison view. The x-axis is the question number and the y-axis is the percentage of students that answered correctly. This view aims to compare the correction rate of two particular groups of students, for example students across two offerings, male vs. female students, etc.</p>
+  <p>You can pick the two groups by selecting appropriate fields in the side bar. Demographic options can be shown by clicking the "Filters" button.
+  <p>You can zoom in on a smaller set of questions by using the brushing in the secondary region.</p>
+  <p>Click the "Submit" button to reflect all the changes.</p>
+  <p>Click the "QuestionView" button to go back to the per question view. </p>
+</div>
+
+<div id="clustered_instruction" style="display: none;">
+  This is the grade overview panel. It's most useful in cluster mode: you can view the performance trends for student clusters of roughly equal size. The lower clusters tend to indicate drop-off rate due to assignments, while the upper clusters show improvement and fan-out in the grades of those who complete the course.
+  <p>You can switch between the offerings with the dropdown menu at upper right. </p>
+  <p>The x-axis is the assignment id number and the y-axis is the score, out of 100 percent (most assignments had extra credit options). Each line represents one student or cluster. If in clusters, it reprents the average of all N students in the cluster (roughly enrollment/N). You can select to show all students or a number of clusters via the lower dropdown on the right. </p>
+  <p> You can filter the assignment by the checkboxes, to show more general trends, e.g from the start to end of class. </p>
+</div>
+
+<div id="timestamps_instruction" style="display: none;">
+  This is the assignment timestamp panel. You can use this to view how late-submitters perform versus early-submitters. (Generally we expect early submitters to do better). You can also see patterns in submission (people tend to try the autograder again after the solutions are released) and in the autograder. Try switching to assignment 5 or 6 to see the autograder force people into tiers. 
+  <p>You can switch between the offerings with the dropdown menu at upper right. </p>
+  <p>The x-axis is the timestamp in seconds and the y-axis is the score, out of 100 percent (most assignments had extra credit options). Each dot represents one student's submission. For this view we only record one submission per student. </p>
+  <p> You can filter the assignment with the dropdown menu. </p>
+</div>

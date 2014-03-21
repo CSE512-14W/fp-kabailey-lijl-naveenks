@@ -1,5 +1,4 @@
-The data we chose to work with was largely data provided by default through Coursera. We have tables of data corresponding to assignments, each of which may be submitted multiple times by a single student. Each submission is tracked with a  timestamp, submission number, and final score. For the midterm and final we have a single submission with timestamp and grade. This aggregate information is at the core of three of our views: {\bf Aggregate View}, {\bf Timescale View} and {\bf
-Impact View}
+The data we chose to work with was largely data provided by default through Coursera. We have tables of data corresponding to assignments, each of which may be submitted multiple times by a single student. Each submission is tracked with a  timestamp, submission number, and final score. For the midterm and final we have a single submission with timestamp and grade. This aggregate information is at the core of two of our views: {\bf Aggregate View} and  {\bf Timescale View}.
 
 In addition, for each exam we have a breakdown of questions, how many points each was worth, and what percentage of the students correctly answered the question. This information is used to generate
 {\bf Exam View} and the comparisons for subviews. 
@@ -15,7 +14,7 @@ The core of the visualization provided are \emph{views} which switch out the mai
 
 \begin{figure}[htb]
  \centering
- \includegraphics[width=3.5in]{aggregate_stub.png}
+ \includegraphics[width=3.5in]{clusters.jpg}
  \caption{Aggregate View.}
  \label{fig:aggregate}	
 \end{figure}
@@ -26,7 +25,7 @@ This view provides a generalized timescale view of the course. Each assignment a
 
 \begin{figure}[htb]
  \centering
- \includegraphics[width=3.5in]{aggregate_stub.png}
+ \includegraphics[width=3.5in]{timescale.jpg}
  \caption{Timescale View.}
  \label{fig:timescale}	
 \end{figure}
@@ -35,15 +34,15 @@ This view provides a generalized timescale view of the course. Each assignment a
 This view provides a zoomed-in view of the assignments and exam scores in relation to the timestamp with which they were submitted. This view originated from a desire to answer the question \emph{do late submitters overall score worse than early submitters?}
 
 
-\begin{figure}[htb]
- \centering
- \includegraphics[width=3.5in]{aggregate_stub.png}
- \caption{Impact View.}
- \label{fig:impact}	
-\end{figure}
-
-\paragraph{Impact View (see Figure~\ref{fig:impact})}
-This view provides a scatterplot reflecting the impact of an assignment or exam on the final grade. Each point is a single student, where the x value is the assignment grade and the y value is the final exam grade. In an ideal world, each assignment would be an equally good predictor of the final grade. When an assignment is a poor predictor, whether a student does well on that exam has little to no impact on the final grade, and we see a randomized scatter plot. When an assignment is a perfect predictor, we see a perfect diagonal formed by the scatter plot. Most assignments fall somewhere between the two.
+%\begin{figure}[htb]
+% \centering
+% \includegraphics[width=3.5in]{aggregate_stub.png}
+% \caption{Impact View.}
+% \label{fig:impact}	
+%\end{figure}
+%
+%\paragraph{Impact View (see Figure~\ref{fig:impact})}
+%This view provides a scatterplot reflecting the impact of an assignment or exam on the final grade. Each point is a single student, where the x value is the assignment grade and the y value is the final exam grade. In an ideal world, each assignment would be an equally good predictor of the final grade. When an assignment is a poor predictor, whether a student does well on that exam has little to no impact on the final grade, and we see a randomized scatter plot. When an assignment is a perfect predictor, we see a perfect diagonal formed by the scatter plot. Most assignments fall somewhere between the two.
 
 
 \begin{figure}[htb]
@@ -78,13 +77,13 @@ We also provides a view to compare two groups of students. The two groups will h
 
 \begin{figure}[htb]
  \centering
- \includegraphics[width=3.5in]{aggregate_stub.png}
+ \includegraphics[width=3.5in]{demo.jpg}
  \caption{Demographic View.}
   \label{fig:demo}	
 \end{figure}
 
 \paragraph{Demographic View (see Figure~\ref{fig:demo})}
-TODO
+This view provides a basic snapshot of the course statistics, including basic demographic breakdowns.
 
 \subsection{Background Computation}
 To save time in loading the actual visualization, some of the computation is done in the background. 

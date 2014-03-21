@@ -17,7 +17,7 @@ Visualizing Data from Massive Online Open Courses
   1. Data cleanup and transformation
   2. Aggregate view
   3. Timescale view
-  4. Impact view
+  4. Clustering Scripts
 
 - Jialin Li:
   1. Midterm and final views

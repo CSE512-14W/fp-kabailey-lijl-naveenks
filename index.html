@@ -10,6 +10,8 @@
     <script type="text/javascript" src="main.js"></script>
     <script type="text/javascript" src="utilities.js"></script>
     <script type="text/javascript" src="midterm.js"></script>
+    <script type="text/javascript" src="aggregate.js"></script>
+    <script type="text/javascript" src="timescales.js"></script>
   </head>
 
   <body>
@@ -18,11 +20,12 @@
   <table id=container>
   
   <tr><td id=topbar colspan=2>
-<!--    <div class=view onclick="view1()"> Demographics </div> -->
-    <div class=view onclick="midterm(true, 0)"> Midterm </div>
-    <div class=view onclick="midterm(true, 1)"> Final</div>
-    <div class=view onclick="view4()"> All Grades</div>
-<!--     <div class=view onclick="view5()"> Impact</div> -->
+    <div class=view onclick="view1()"> Demographics </div>
+    <div class=view onclick="aggregate()"> All Grades</div>
+    <div class=view onclick="hwtimescales()"> Timestamps</div>
+    <div class=view onclick="midterm(true)"> Midterm </div>
+    <div class=view onclick="view3()"> Final</div>
+    <div class=view onclick="view5()"> Impact</div>
   </td></tr>
 
   <tr>
@@ -44,49 +47,62 @@
 </html>
 
 <!--  not displayed side bars for each view -->
-<div id="sidebar1" style="display: none;">
+<div id="timestamps" style="display: none;">
+  <p><span class=filterlabel>Display Course Offering</span><br />
+    <select id=offering onchange="switchoffer(this.value)">
+    <option value="1">Offering 001</option>
+    <option value="2">Offering 002</option>
+    </select> <br/>
+  </p>
+
   <p><span class=filterlabel>Include Assignments</span><br />
-    <input type="checkbox" name="box1" onchange="checkbox1(this.checked)" checked>Assignment 1
-    <input type="checkbox" name="box2" onchange="checkbox2(this.checked)" checked>Assignment 2<br />
-    <input type="checkbox" name="box3" onchange="checkbox3(this.checked)" checked>Assignment 3
-    <input type="checkbox" name="box4" onchange="checkbox4(this.checked)" checked>Assignment 4<br />
-    <input type="checkbox" name="box5" onchange="checkbox5(this.checked)" checked>Assignment 5
-    <input type="checkbox" name="box6" onchange="checkbox6(this.checked)" checked>Assignment 6<br />
-    <input type="checkbox" name="box7">Midterm Exam<br />     
-    <input type="checkbox" name="box8">Final Exam<br /></p>
-
-  <p><span class=filterlabel>Some other options</span><br />
-    <input type="radio" name="box1">Course Offering<br />
-    <input type="radio" name="box1">Completers  <br />
-    <input type="radio" name="box1">Final Grade<br />
-    <input type="radio" name="box1">Gender (unavailable) <br />
-    <input type="radio" name="box1">Age Group (unavailable) <br />
-    <input type="radio" name="box1">Country (unavailable <br />
-    <input type="radio" name="box1">None<br /></p>
-  
-  <p><span class=filterlabel>Even more options</span><br />
-    <select id=variable1 onchange="view5()">
-      <option value="op1">Assignment</option>
-      <option value="op2">Midterm</option>
-      <option value="op3">Final</option>
-      <option value="op4">All</option>
-    </select> <br />
-    versus <br />
-    <select id=variable2 onchange="view5()">
-      <option value="op1">Midterm</option>
-      <option value="op2">Final Exam</option>
-      <option value="op3">Final Grade</option>
-      <option value="op4">All </option>
-    </select> <br />
+    <select id="display" onchange="switchassign(this.value)">
+      <option value="1">Assignment 1</option>
+      <option value="2">Assignment 2</option>
+      <option value="3">Assignment 3</option>
+      <option value="4">Midterm Exam</option>
+      <option value="5">Assignment 4</option>
+      <option value="6">Assignment 5</option>
+      <option value="7">Assignment 6</option>
+      <option value="8">Final Exam</option>
+    </select> <br/>
   </p>
 
-  <p><span class=filterlabel>Sample Size</span><br />
-    <select id=sampleSize onchange="sampleSize()">
-      <option value="10">10</option>
-      <option value="20">20</option>
-      <option value="50">50</option>
-    </select> <br />
+  <p><span class=filterlabel>Color Display By</span><br />
+    <input type="radio" name="color" onchange="switchcolor(0)">None<br />
+    <input type="radio" name="color" onchange="switchcolor(1)">Gender<br />
+    <input type="radio" name="color" onchange="switchcolor(2)">Age Groups <br />
+    <input type="radio" name="color" onchange="switchcolor(3)">Background <br />
+    <input type="radio" name="color" onchange="switchcolor(4)">Country <br /> </p>
+</div>
+
+<div id="allgrades" style="display: none;">
+  <p><span class=filterlabel>Display Course Offering</span><br />
+    <select id=offering onchange="switchoffer(this.value)">
+    <option value="1">Offering 001</option>
+    <option value="2">Offering 002</option>
+    </select> <br/>
   </p>
+
+  <p><span class=filterlabel>Include Assignments</span><br />
+    <select id="display" onchange="switchassign(this.value)">
+      <option value="1">Assignment 1</option>
+      <option value="2">Assignment 2</option>
+      <option value="3">Assignment 3</option>
+      <option value="4">Midterm Exam</option>
+      <option value="5">Assignment 4</option>
+      <option value="6">Assignment 5</option>
+      <option value="7">Assignment 6</option>
+      <option value="8">Final Exam</option>
+    </select> <br/>
+  </p>
+
+  <p><span class=filterlabel>Color Display By</span><br />
+    <input type="radio" name="color" onchange="switchcolor(0)">None<br />
+    <input type="radio" name="color" onchange="switchcolor(1)">Gender<br />
+    <input type="radio" name="color" onchange="switchcolor(2)">Age Groups <br />
+    <input type="radio" name="color" onchange="switchcolor(3)">Background <br />
+    <input type="radio" name="color" onchange="switchcolor(4)">Country <br /> </p>
 </div>
 
 <!-- Midterm side bars -->
@@ -848,6 +864,8 @@
 <div id="emptybar" style="display: none;">
 
 <!-- not displayed instructions -->
+<div id="empty_instruction" style="display: none;"></div>
+
 <div id="midterm_instruction" style="display: none;">
   This is the midterm panel. You can switch between aggregate view and per question view by clicking the corresponding view button.
   <p>You are currently in the aggregate view. The x-axis is the question number and the y-axis is the cumulative score. Each band shows the score range of certain group of students. Students are grouped by percentiles of their total midterm score. This view shows general trends of students: steeper slope shows better understandings of the topic, while flatter slope indicates common misunderstandings.</p>

@@ -8,12 +8,24 @@ d3.selection.prototype.moveToFront = function() {
 var margin, margin2, width, height, height2;
 var x, s2, y, y2;
 var xAxis, xAxis2, yAxis;
-var students, num_questions;
+var students;
+var midterm_offering1_num_questions;
+var midterm_offering2_num_questions;
+var final_offering1_num_questions;
+var final_offering2_num_questions;
 var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
 var styles = ["area a1", "area a2", "area a3", "area a4", "area a5", "area a6"];
-var student_dict = {};
-var demo_Nfields = ["gender"];
-var demo_Qfields = ["age"];
+var demo_Nfields = ["gender", "continent"];
+var demo_Qfields = ["agegroup"];
+var all_students_midterm_offering1;
+var all_students_midterm_offering2;
+var all_students_final_offering1;
+var all_students_final_offering2;
+var student_midterm_offering1_dict = {};
+var student_midterm_offering2_dict = {};
+var student_final_offering1_dict = {};
+var student_final_offering2_dict = {};
+
 /* Filters */
 
 var demo_filters = {Male:true,
@@ -23,7 +35,13 @@ var demo_filters = {Male:true,
 		    A20_30:true,
 		    A30_40:true,
 		    A40_50:true,
-		    A50_60:true
+		    A50_60:true,
+		    C_AF:true,
+		    C_AS:true,
+		    C_AU:true,
+		    C_EU:true,
+		    C_NA:true,
+		    C_SA:true
 		   };
 
 var G_demo_filters = [{Male:true,
@@ -33,7 +51,13 @@ var G_demo_filters = [{Male:true,
 		       A20_30:true,
 		       A30_40:true,
 		       A40_50:true,
-		       A50_60:true
+		       A50_60:true,
+		       C_AF:true,
+		       C_AS:true,
+		       C_AU:true,
+		       C_EU:true,
+		       C_NA:true,
+		       C_SA:true
 		      },
 		      {Male:true,
 		       Female:true,
@@ -42,7 +66,13 @@ var G_demo_filters = [{Male:true,
 		       A20_30:true,
 		       A30_40:true,
 		       A40_50:true,
-		       A50_60:true
+		       A50_60:true,
+		       C_AF:true,
+		       C_AS:true,
+		       C_AU:true,
+		       C_EU:true,
+		       C_NA:true,
+		       C_SA:true
 		      }
 		     ];
 
@@ -68,6 +98,27 @@ var ranges = [{index:0,
 	      }
 	     ];
 
+var countries = [{id:"C_AF",
+		  name:"Africa"
+		 },
+		 {id:"C_AS",
+		  name:"Asia"
+		 },
+		 {id:"C_AU",
+		  name:"Australia"
+		 },
+		 {id:"C_EU",
+		  name:"Europe"
+		 },
+		 {id:"C_NA",
+		  name:"North America"
+		 },
+		 {id:"C_SA",
+		  name:"South America"
+		 }
+		];
+
+
 var G_ranges = [{index:0,
 		 low:0,
 		 high:0.5
@@ -79,27 +130,27 @@ var G_ranges = [{index:0,
 	       ];
 
 var age_groups = [{low:0,
-		   high:10,
+		   high:18,
 		   name: "A0_10"
 		  },
-		  {low:10,
-		   high:20,
+		  {low:18,
+		   high:25,
 		   name: "A10_20"
 		  },
-		  {low:20,
-		   high:30,
+		  {low:25,
+		   high:35,
 		   name: "A20_30"
 		  },
-		  {low:30,
-		   high:40,
+		  {low:35,
+		   high:45,
 		   name: "A30_40"
 		  },
-		  {low:40,
-		   high:50,
+		  {low:45,
+		   high:55,
 		   name: "A40_50"
 		  },
-		  {low:50,
-		   high:60,
+		  {low:55,
+		   high:70,
 		   name: "A50_60"
 		  }];
 
@@ -109,10 +160,12 @@ var partitioned = "perc";
 
 var partitioned_demo = "gender";
 
+var offerings = 1;
+
 /* Initialize student data */
 d3.csv("data/midterm_offering1.csv", function(error, data) {
     var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
-    students = keys.map(function(name) {
+    all_students_midterm_offering1 = keys.map(function(name) {
 	var sum = 0;
 	var index = 0;
 	return {
@@ -129,34 +182,33 @@ d3.csv("data/midterm_offering1.csv", function(error, data) {
 		    q_score: q_score
 		};
 	    }),
-	    demos: {gender: "M",
-		    age: 20
-		   }
 	};
     });
 
-    num_questions = students[0].values.length;
-    students.sort(function(a, b) {return a.values[num_questions-1].score - b.values[num_questions-1].score});
+    midterm_offering1_num_questions = all_students_midterm_offering1[0].values.length;
+    all_students_midterm_offering1.sort(function(a, b) {return a.values[midterm_offering1_num_questions-1].score - b.values[midterm_offering1_num_questions-1].score});
 
-    students.forEach(function(d) {
-	student_dict[d.name] = d;
+    all_students_midterm_offering1.forEach(function(d) {
+	student_midterm_offering1_dict[d.name] = d;
     });
 });
 
-d3.csv("data/demographics.csv", function(error, data) {
+d3.csv("data/demographics_offering1.csv", function(error, data) {
     data.forEach(function(d) {
-	var st = student_dict[d.id];
-	st.demos = new Object();
+	if (d.studentid in student_midterm_offering1_dict){
+	    var st = student_midterm_offering1_dict[d.studentid];
+	    st.demos = new Object();
 	
-	demo_Nfields.forEach(function(e) {
-	    st.demos[e] = d[e];
-	});
-	demo_Qfields.forEach(function(e) {
-	    st.demos[e] = +d[e];
-	});
-
+	    demo_Nfields.forEach(function(e) {
+		st.demos[e] = d[e];
+	    });
+	    demo_Qfields.forEach(function(e) {
+		st.demos[e] = +d[e];
+	    });
+	}
     });
 });
+
 	    
 /* Filter functions */
 
@@ -169,8 +221,46 @@ function init_filters()
 		    A20_30:true,
 		    A30_40:true,
 		    A40_50:true,
-		    A50_60:true
+		    A50_60:true,
+		    C_AF:true,
+		    C_AS:true,
+		    C_AU:true,
+		    C_EU:true,
+		    C_NA:true,
+		    C_SA:true
 		   };
+
+    G_demo_filters = [{Male:true,
+		       Female:true,
+		       A0_10:true,
+		       A10_20:true,
+		       A20_30:true,
+		       A30_40:true,
+		       A40_50:true,
+		       A50_60:true,
+		       C_AF:true,
+		       C_AS:true,
+		       C_AU:true,
+		       C_EU:true,
+		       C_NA:true,
+		       C_SA:true
+		      },
+		      {Male:true,
+		       Female:true,
+		       A0_10:true,
+		       A10_20:true,
+		       A20_30:true,
+		       A30_40:true,
+		       A40_50:true,
+		       A50_60:true,
+		       C_AF:true,
+		       C_AS:true,
+		       C_AU:true,
+		       C_EU:true,
+		       C_NA:true,
+		       C_SA:true
+		      }
+		     ];
 
     ranges = [{index:0,
 	       visible:true,
@@ -204,27 +294,9 @@ function init_filters()
 		}
 	       ];
 
-    G_demo_filters = [{Male:true,
-		       Female:true,
-		       A0_10:true,
-		       A10_20:true,
-		       A20_30:true,
-		       A30_40:true,
-		       A40_50:true,
-		       A50_60:true
-		      },
-		      {Male:true,
-		       Female:true,
-		       A0_10:true,
-		       A10_20:true,
-		       A20_30:true,
-		       A30_40:true,
-		       A40_50:true,
-		       A50_60:true
-		      }
-		     ];
-    
     partitioned = "perc";
+
+    offerings = 1;
 }
 
 function G_perc_value()
@@ -270,6 +342,15 @@ function demo_cb()
     demo_filters.A30_40 = document.getElementById("AG_30_40").checked;
     demo_filters.A40_50 = document.getElementById("AG_40_50").checked;
     demo_filters.A50_60 = document.getElementById("AG_50_60").checked;
+
+    demo_filters.C_AF = document.getElementById("C_Africa").checked;
+    demo_filters.C_AS = document.getElementById("C_Asia").checked;
+    demo_filters.C_AU = document.getElementById("C_Australia").checked;
+    demo_filters.C_EU = document.getElementById("C_Europe").checked;
+    demo_filters.C_NA = document.getElementById("C_NorthAmerica").checked;
+    demo_filters.C_SA = document.getElementById("C_SouthAmerica").checked;
+
+    console.log(demo_filters);
 }
 
 function G_demo_cb()
@@ -285,6 +366,13 @@ function G_demo_cb()
 	G_demo_filters[i].A30_40 = document.getElementById("AG" + i + "_30_40").checked;
 	G_demo_filters[i].A40_50 = document.getElementById("AG" + i + "_40_50").checked;
 	G_demo_filters[i].A50_60 = document.getElementById("AG" + i + "_50_60").checked;
+
+	G_demo_filters[i].C_AF = document.getElementById("CG" + i + "_Africa").checked;
+	G_demo_filters[i].C_AS = document.getElementById("CG" + i + "_Asia").checked;
+	G_demo_filters[i].C_AU = document.getElementById("CG" + i + "_Australia").checked;
+	G_demo_filters[i].C_EU = document.getElementById("CG" + i + "_Europe").checked;
+	G_demo_filters[i].C_NA = document.getElementById("CG" + i + "_NorthAmerica").checked;
+	G_demo_filters[i].C_SA = document.getElementById("CG" + i + "_SouthAmerica").checked;
     }
 }
 
@@ -303,9 +391,16 @@ function partition() {
     case "2":
 	partitioned_demo = "age";
 	break;
+    case "3":
+	partitioned_demo = "country";
     default:
 	partitioned_demo = "gender";
     }
+}
+
+function f_offering(value)
+{
+    offerings = value;
 }
 
 function filter_demo(student, d_filters) {
@@ -318,12 +413,20 @@ function filter_demo(student, d_filters) {
     /* Age group */
     var i;
     for (i = 0; i < age_groups.length; i++) {
-	if (student.demos.age >= age_groups[i].low && student.demos.age < age_groups[i].high) {
+	if (student.demos.agegroup >= age_groups[i].low && student.demos.agegroup < age_groups[i].high) {
 	    if (d_filters[age_groups[i].name] == false)
 		return false;
 	}
     }
-    
+
+    /* Continent */
+    for (i = 0; i < countries.length; i++) {
+	if (student.demos.continent == countries[i].name) {
+	    if (d_filters[countries[i].id] == false)
+		return false;
+	}
+    }
+
     return true;
 }
 
@@ -333,6 +436,11 @@ function midterm(change_bar)
 {
     currentView = 'midterm';
     show_loading();
+
+    console.log(all_students_midterm_offering1);
+
+    var students = all_students_midterm_offering1;
+    var num_questions = midterm_offering1_num_questions;
 
     fill_instruction("midterm_instruction");
 
@@ -555,6 +663,8 @@ function midterm_question(change_bar)
 	init_filters();
     }
 
+    fill_instruction("midterm_question_instruction");
+
     var margin = {top: 20, right: 30, bottom: 150, left: 20},
     margin2 = {top: 460, right: 30, bottom: 40, left: 20},
     width = 900 - margin.left - margin.right,
@@ -653,6 +763,9 @@ function midterm_question(change_bar)
 	case "age":
 	    demos = age_groups;
 	    break;
+	case "country":
+	    demos = countries;
+	    break;
 	default:
 	    demos = genders;
 	}
@@ -680,12 +793,20 @@ function midterm_question(change_bar)
 		    k = 1;
 	    } else if (partitioned_demo == "age") {
 		for (j = 0; j < age_groups.length; j++) {
-		    if (s.demos.age >= age_groups[j].low && s.demos.age < age_groups[j].high) {
+		    if (s.demos.agegroup >= age_groups[j].low && s.demos.agegroup < age_groups[j].high) {
+			k = j;
+			break;
+		    }
+		}
+	    } else if (partitioned_demo == "country") {
+		for (j = 0; j < countries.length; j++) {
+		    if (s.demos.continent == countries[j].name) {
 			k = j;
 			break;
 		    }
 		}
 	    }
+
 	    index = 0;
 	    s.values.forEach(function(d) {
 		bands[k].values[index].y1 += d.q_score;
@@ -801,6 +922,8 @@ function midterm_sbs(change_bar)
 	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
 	init_filters();
     }
+
+    fill_instruction("midterm_compare_instruction");
 
     var margin = {top: 20, right: 30, bottom: 150, left: 20},
     margin2 = {top: 460, right: 30, bottom: 40, left: 20},

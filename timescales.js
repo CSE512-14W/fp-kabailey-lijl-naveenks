@@ -1,37 +1,36 @@
+var t_now_showing = 1;
+var t_now_offering = 1;
+var t_now_coloring = 3;
 
-//give non-submissions timestamps too
-function defaulttimestamps(hw){
-    if (now_offering == 1 ){
-	    switch (hw) {
-	    case 5: return 1358895453;
-	    case 6: return 1359640173;
-	    case 11: return 1360529471;
-	    case 13: return 1361748191;
-	    case 15: return 1362428898;
-	    case 17: return 1362882328;}
-	}
-    else {
-	    switch (hw) {
-	    case 5: return 1381054271;
-	    case 6: return 1382423851;
-	    case 11: return 1382807403;
-	    case 13: return 1383402021;
-	    case 15: return 1384777587;
-	    case 17: return 1384587218;}
-    }
+function tswitchassign(foo){
+    t_now_showing = foo;
+    window[currentView](false);
+}
+function tswitchoffer(foo){
+    t_now_offering = foo;
+    window[currentView](false);
+}
+
+function tswitchcolor(foo){
+    t_now_coloring = foo;
+    console.log(t_now_coloring);
+    window[currentView](false);
 }
 
 
 
-function hwtimescales() //grade timeline
+
+
+function hwtimescales(change_bar) //grade timeline
 {
     currentView = 'hwtimescales';
   show_loading();
 
+  if(change_bar){
     document.getElementById("sidebar").innerHTML = document.getElementById("timestamps").innerHTML;
     document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
     fill_instruction("empty_instruction");
-
+  }
   var margin = {top: 20, right: 80, bottom: 80, left: 50},
       width = 900 - margin.left - margin.right,
       height = 600 - margin.top - margin.bottom;
@@ -66,7 +65,7 @@ function hwtimescales() //grade timeline
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-  if(now_offering == 1){
+  if(t_now_offering == 1){
       demodata = demo1;
       data = data1;
   }  else{
@@ -77,28 +76,25 @@ function hwtimescales() //grade timeline
 	  var stripped_data = data.filter(function(d){ 
 		  var sub1 = d.SUBMISSION <= 1;
 		  switch (d.HW) {
-		  case 5: return (now_showing==1)&&sub1;
-		  case 6: return (now_showing==2)&&sub1;
-		  case 11: return (now_showing==3)&&sub1;
-		  case 13: return (now_showing==5)&&sub1;
-		  case 15: return (now_showing==6)&&sub1;
-		  case 17: return (now_showing==7)&&sub1;		       
+		  case 5: return (t_now_showing==1)&&sub1;
+		  case 6: return (t_now_showing==2)&&sub1;
+		  case 11: return (t_now_showing==3)&&sub1;
+		  case 13: return (t_now_showing==5)&&sub1;
+		  case 15: return (t_now_showing==6)&&sub1;
+		  case 17: return (t_now_showing==7)&&sub1;		       
 		  }
 	      });
 	  
 	  function id_to_category(id){
 	      var d_entry = (demodata.filter(function(d){
 			  return d.studentid == id; }))[0];
-
-	      switch (now_coloring){
+	      switch (t_now_coloring){
 	      case 0: return 0; //no category
 	      case 1: return d_entry.gender;
 	      case 2: return d_entry.agegroup;
 	      case 3: return d_entry.background;
 	      case 4: return d_entry.continent;
 	      }
-		  
-		  
 	  }
 	  
 	  x.domain(d3.extent(stripped_data, function(d) { return d.TIMESTAMP;})).nice();
@@ -143,5 +139,24 @@ function hwtimescales() //grade timeline
 		      .attr("cy", function(d) { return y(d.SCORE);    })
 		      .style("fill", function(d) {
 			      return color (id_to_category(d.STUDENTID)); } );
+    var legend = svg.selectAll(".legend")
+        .data(color.domain())
+      .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+    legend.append("rect")
+        .attr("x", width - 18)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", color);
+
+    legend.append("text")
+        .attr("x", width - 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) { return d; });
+
   hide_loading();
 }

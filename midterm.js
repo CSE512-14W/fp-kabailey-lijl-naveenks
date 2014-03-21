@@ -830,6 +830,7 @@ function midterm(change_bar, type)
     }
     
     hide_loading();
+
 }
 
 function midterm_question(change_bar, type)

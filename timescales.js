@@ -1,6 +1,6 @@
 var t_now_showing = 1;
 var t_now_offering = 1;
-var t_now_coloring = 3;
+var t_now_coloring = 0;
 
 function tswitchassign(foo){
     t_now_showing = foo;
@@ -13,7 +13,6 @@ function tswitchoffer(foo){
 
 function tswitchcolor(foo){
     t_now_coloring = foo;
-    console.log(t_now_coloring);
     window[currentView](false);
 }
 
@@ -29,7 +28,7 @@ function hwtimescales(change_bar) //grade timeline
   if(change_bar){
     document.getElementById("sidebar").innerHTML = document.getElementById("timestamps").innerHTML;
     document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
-    fill_instruction("empty_instruction");
+    fill_instruction("timestamps_instruction");
   }
   var margin = {top: 20, right: 80, bottom: 80, left: 50},
       width = 900 - margin.left - margin.right,

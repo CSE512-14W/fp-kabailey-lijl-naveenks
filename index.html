@@ -66,15 +66,16 @@
     </select> <br/>
   </p>
 
-  <p><span class=filterlabel>Color Display By</span><br />
-    <select id="t_color" onchange="tswitchcolor(this.value)">
-      <option value="0">None</option>
-      <option value="1">Gender</option>
-      <option value="2">Age Groups</option>
-      <option value="3">Background</option>
-      <option value="4">Country</option>
-    </select> <br/>
-  </p>
+<!--  <p><span class=filterlabel>Color Display By</span><br />
+    <select id="t_display" onchange="tswitchcolor(this.value)">
+      <option value="0" id="c1" >None</option>
+      <option value="1" id="c2" >Gender</option>
+      <option value="2" id="c3" >AgeGroup</option>
+      <option value="3" id="c4" >Background</option>
+      <option value="4" id="c5" >Continent</option>
+    </select><br/>
+  </p> -->
+
 </div>
 
 <div id="allgrades" style="display: none;">
@@ -895,6 +896,13 @@
 <div id="clustered_instruction" style="display: none;">
   This is the grade overview panel. It's most useful in cluster mode: you can view the performance trends for student clusters of roughly equal size. The lower clusters tend to indicate drop-off rate due to assignments, while the upper clusters show improvement and fan-out in the grades of those who complete the course.
   <p>You can switch between the offerings with the dropdown menu at upper right. </p>
-  <p>The x-axis is the assignment id number and the y-axis is the score, out of 100 percent (most assignments had extra credit options). Each line represents one student or cluster. If in clusters, it reprents the average of all N students in the cluster (roughly enrollment/N). You can select to show all students or a number of clusters via the lower dropdown on the right. 
-  <p> You can filter the assignment by the checkboxes, to show more general trends, e.g from the start to end of class. 
+  <p>The x-axis is the assignment id number and the y-axis is the score, out of 100 percent (most assignments had extra credit options). Each line represents one student or cluster. If in clusters, it reprents the average of all N students in the cluster (roughly enrollment/N). You can select to show all students or a number of clusters via the lower dropdown on the right. </p>
+  <p> You can filter the assignment by the checkboxes, to show more general trends, e.g from the start to end of class. </p>
+</div>
+
+<div id="timestamps_instruction" style="display: none;">
+  This is the assignment timestamp panel. You can use this to view how late-submitters perform versus early-submitters. (Generally we expect early submitters to do better). You can also see patterns in submission (people tend to try the autograder again after the solutions are released) and in the autograder. Try switching to assignment 5 or 6 to see the autograder force people into tiers. 
+  <p>You can switch between the offerings with the dropdown menu at upper right. </p>
+  <p>The x-axis is the timestamp in seconds and the y-axis is the score, out of 100 percent (most assignments had extra credit options). Each dot represents one student's submission. For this view we only record one submission per student. </p>
+  <p> You can filter the assignment with the dropdown menu. </p>
 </div>

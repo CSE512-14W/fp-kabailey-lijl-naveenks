@@ -1,3 +1,10 @@
+/*
+ * Midterms and Finals panel
+ * Including aggregate, per question and comparison view
+ * 
+ * Created by Jialin Li
+ */
+
 d3.selection.prototype.moveToFront = function() {
     return this.each(function() {
 	this.parentNode.appendChild(this);

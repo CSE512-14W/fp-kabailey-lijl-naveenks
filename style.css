@@ -293,6 +293,12 @@ td {
     clip-path: url('/#clip');
 }
 
+.area.a7 {
+    fill: steelblue;
+    opacity: 0.5;
+    clip-path: url('/#clip');
+}
+
 .brush .extent {
     stroke: #fff;
     fill-opacity: .125;

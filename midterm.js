@@ -9,12 +9,11 @@ var margin, margin2, width, height, height2;
 var x, s2, y, y2;
 var xAxis, xAxis2, yAxis;
 var students;
-var midterm_offering1_num_questions;
-var midterm_offering2_num_questions;
-var final_offering1_num_questions;
-var final_offering2_num_questions;
-var q_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
-var styles = ["area a1", "area a2", "area a3", "area a4", "area a5", "area a6"];
+var mid_scores = [8,8,8,8,12,12,12,12,12,12,31,31,31,31,31,31,31,31,31,31,31,31,31,8,8,8,8,12,12,12,1,1,1,1,1,1,1,1,1,5,5,5,5,5,13,13,13,13,13,15,15,15,1,1,1,1,1,1,1,1,1,1,1,1];
+var fin_scores = [8,8,8,13,13,13,13,9,9,9,4,4,4,4,14,14,14,14,14,14,14,4,4,4,4,4,4,4,4,12,12,12,12,12,12,12,1,1,2,1,1,13,13,9,9,9,4,4,4,4,14,14,14,14,14,14,14,9,9,9,9,8,8,8];
+var midterm_num_questions = mid_scores.length;
+var final_num_questions = fin_scores.length;
+var styles = ["area a1", "area a2", "area a3", "area a4", "area a5", "area a6", "area a7"];
 var demo_Nfields = ["gender", "continent"];
 var demo_Qfields = ["agegroup"];
 var all_students_midterm_offering1;
@@ -41,7 +40,8 @@ var demo_filters = {Male:true,
 		    C_AU:true,
 		    C_EU:true,
 		    C_NA:true,
-		    C_SA:true
+		    C_SA:true,
+		    C_UN:true
 		   };
 
 var G_demo_filters = [{Male:true,
@@ -57,7 +57,8 @@ var G_demo_filters = [{Male:true,
 		       C_AU:true,
 		       C_EU:true,
 		       C_NA:true,
-		       C_SA:true
+		       C_SA:true,
+		       C_UN:true
 		      },
 		      {Male:true,
 		       Female:true,
@@ -72,7 +73,8 @@ var G_demo_filters = [{Male:true,
 		       C_AU:true,
 		       C_EU:true,
 		       C_NA:true,
-		       C_SA:true
+		       C_SA:true,
+		       C_UN:true
 		      }
 		     ];
 
@@ -115,6 +117,9 @@ var countries = [{id:"C_AF",
 		 },
 		 {id:"C_SA",
 		  name:"South America"
+		 },
+		 {id:"C_UN",
+		  name:"Unknown"
 		 }
 		];
 
@@ -131,36 +136,50 @@ var G_ranges = [{index:0,
 
 var age_groups = [{low:0,
 		   high:18,
-		   name: "A0_10"
+		   id: "A0_10",
+		   name: "0-18"
 		  },
 		  {low:18,
 		   high:25,
-		   name: "A10_20"
+		   id: "A10_20",
+		   name: "18-25"
 		  },
 		  {low:25,
 		   high:35,
-		   name: "A20_30"
+		   id: "A20_30",
+		   name: "25-35"
 		  },
 		  {low:35,
 		   high:45,
-		   name: "A30_40"
+		   id: "A30_40",
+		   name: "35-45"
 		  },
 		  {low:45,
 		   high:55,
-		   name: "A40_50"
+		   id: "A40_50",
+		   name: "45-55"
 		  },
 		  {low:55,
 		   high:70,
-		   name: "A50_60"
+		   id: "A50_60",
+		   name: "55+"
 		  }];
 
-var genders = ["M", "F"];
+var genders = [{name:"Male"
+	       },
+	       {name:"Female"
+	       }
+	      ];
 
 var partitioned = "perc";
 
 var partitioned_demo = "gender";
 
 var offerings = 1;
+
+var offerings_g1 = 1;
+
+var offerings_g2 = 1;
 
 /* Initialize student data */
 d3.csv("data/midterm_offering1.csv", function(error, data) {
@@ -172,7 +191,7 @@ d3.csv("data/midterm_offering1.csv", function(error, data) {
 	    name: name,
 	    values: data.map(function(d) {
 		var score = +d[name];
-		score = score * q_scores[index] + sum;
+		score = score * mid_scores[index] + sum;
 		sum = score;
 		q_score = +d[name];
 		index += 1;
@@ -185,11 +204,97 @@ d3.csv("data/midterm_offering1.csv", function(error, data) {
 	};
     });
 
-    midterm_offering1_num_questions = all_students_midterm_offering1[0].values.length;
-    all_students_midterm_offering1.sort(function(a, b) {return a.values[midterm_offering1_num_questions-1].score - b.values[midterm_offering1_num_questions-1].score});
+    all_students_midterm_offering1.sort(function(a, b) {return a.values[midterm_num_questions-1].score - b.values[midterm_num_questions-1].score});
 
     all_students_midterm_offering1.forEach(function(d) {
 	student_midterm_offering1_dict[d.name] = d;
+    });
+});
+
+d3.csv("data/midterm_offering2.csv", function(error, data) {
+    var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
+    all_students_midterm_offering2 = keys.map(function(name) {
+	var sum = 0;
+	var index = 0;
+	return {
+	    name: name,
+	    values: data.map(function(d) {
+		var score = +d[name];
+		score = score * mid_scores[index] + sum;
+		sum = score;
+		q_score = +d[name];
+		index += 1;
+		return {
+		    question: +d.question,
+		    score: score,
+		    q_score: q_score
+		};
+	    }),
+	};
+    });
+
+    all_students_midterm_offering2.sort(function(a, b) {return a.values[midterm_num_questions-1].score - b.values[midterm_num_questions-1].score});
+
+    all_students_midterm_offering2.forEach(function(d) {
+	student_midterm_offering2_dict[d.name] = d;
+    });
+});
+
+d3.csv("data/final_offering1.csv", function(error, data) {
+    var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
+    all_students_final_offering1 = keys.map(function(name) {
+	var sum = 0;
+	var index = 0;
+	return {
+	    name: name,
+	    values: data.map(function(d) {
+		var score = +d[name];
+		score = score * fin_scores[index] + sum;
+		sum = score;
+		q_score = +d[name];
+		index += 1;
+		return {
+		    question: +d.question,
+		    score: score,
+		    q_score: q_score
+		};
+	    }),
+	};
+    });
+
+    all_students_final_offering1.sort(function(a, b) {return a.values[final_num_questions-1].score - b.values[final_num_questions-1].score});
+
+    all_students_final_offering1.forEach(function(d) {
+	student_final_offering1_dict[d.name] = d;
+    });
+});
+
+d3.csv("data/final_offering2.csv", function(error, data) {
+    var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
+    all_students_final_offering2 = keys.map(function(name) {
+	var sum = 0;
+	var index = 0;
+	return {
+	    name: name,
+	    values: data.map(function(d) {
+		var score = +d[name];
+		score = score * mid_scores[index] + sum;
+		sum = score;
+		q_score = +d[name];
+		index += 1;
+		return {
+		    question: +d.question,
+		    score: score,
+		    q_score: q_score
+		};
+	    }),
+	};
+    });
+
+    all_students_final_offering2.sort(function(a, b) {return a.values[final_num_questions-1].score - b.values[final_num_questions-1].score});
+
+    all_students_final_offering2.forEach(function(d) {
+	student_final_offering2_dict[d.name] = d;
     });
 });
 
@@ -206,8 +311,50 @@ d3.csv("data/demographics_offering1.csv", function(error, data) {
 		st.demos[e] = +d[e];
 	    });
 	}
+
+	if (d.studentid in student_final_offering1_dict){
+	    var st = student_final_offering1_dict[d.studentid];
+	    st.demos = new Object();
+	
+	    demo_Nfields.forEach(function(e) {
+		st.demos[e] = d[e];
+	    });
+	    demo_Qfields.forEach(function(e) {
+		st.demos[e] = +d[e];
+	    });
+	}
     });
 });
+
+d3.csv("data/demographics_offering2.csv", function(error, data) {
+    data.forEach(function(d) {
+	if (d.studentid in student_midterm_offering2_dict){
+	    var st = student_midterm_offering2_dict[d.studentid];
+	    st.demos = new Object();
+	
+	    demo_Nfields.forEach(function(e) {
+		st.demos[e] = d[e];
+	    });
+	    demo_Qfields.forEach(function(e) {
+		st.demos[e] = +d[e];
+	    });
+	}
+
+	if (d.studentid in student_final_offering2_dict){
+	    var st = student_final_offering2_dict[d.studentid];
+	    st.demos = new Object();
+	
+	    demo_Nfields.forEach(function(e) {
+		st.demos[e] = d[e];
+	    });
+	    demo_Qfields.forEach(function(e) {
+		st.demos[e] = +d[e];
+	    });
+	}
+
+    });
+});
+
 
 	    
 /* Filter functions */
@@ -227,7 +374,8 @@ function init_filters()
 		    C_AU:true,
 		    C_EU:true,
 		    C_NA:true,
-		    C_SA:true
+		    C_SA:true,
+		    C_UN:true
 		   };
 
     G_demo_filters = [{Male:true,
@@ -243,7 +391,8 @@ function init_filters()
 		       C_AU:true,
 		       C_EU:true,
 		       C_NA:true,
-		       C_SA:true
+		       C_SA:true,
+		       C_UN:true
 		      },
 		      {Male:true,
 		       Female:true,
@@ -258,7 +407,8 @@ function init_filters()
 		       C_AU:true,
 		       C_EU:true,
 		       C_NA:true,
-		       C_SA:true
+		       C_SA:true,
+		       C_UN:true
 		      }
 		     ];
 
@@ -297,6 +447,8 @@ function init_filters()
     partitioned = "perc";
 
     offerings = 1;
+    offerings_g1 = 1;
+    offerings_g2 = 1;
 }
 
 function G_perc_value()
@@ -349,8 +501,7 @@ function demo_cb()
     demo_filters.C_EU = document.getElementById("C_Europe").checked;
     demo_filters.C_NA = document.getElementById("C_NorthAmerica").checked;
     demo_filters.C_SA = document.getElementById("C_SouthAmerica").checked;
-
-    console.log(demo_filters);
+    demo_filters.C_UN = document.getElementById("C_Unknown").checked;    
 }
 
 function G_demo_cb()
@@ -373,6 +524,7 @@ function G_demo_cb()
 	G_demo_filters[i].C_EU = document.getElementById("CG" + i + "_Europe").checked;
 	G_demo_filters[i].C_NA = document.getElementById("CG" + i + "_NorthAmerica").checked;
 	G_demo_filters[i].C_SA = document.getElementById("CG" + i + "_SouthAmerica").checked;
+	G_demo_filters[i].C_UN = document.getElementById("CG" + i + "_Unknown").checked;    
     }
 }
 
@@ -393,6 +545,7 @@ function partition() {
 	break;
     case "3":
 	partitioned_demo = "country";
+	break;
     default:
 	partitioned_demo = "gender";
     }
@@ -401,6 +554,16 @@ function partition() {
 function f_offering(value)
 {
     offerings = value;
+}
+
+function g1_offering(value)
+{
+    offerings_g1 = value;
+}
+
+function g2_offering(value)
+{
+    offerings_g2 = value;
 }
 
 function filter_demo(student, d_filters) {
@@ -414,7 +577,7 @@ function filter_demo(student, d_filters) {
     var i;
     for (i = 0; i < age_groups.length; i++) {
 	if (student.demos.agegroup >= age_groups[i].low && student.demos.agegroup < age_groups[i].high) {
-	    if (d_filters[age_groups[i].name] == false)
+	    if (d_filters[age_groups[i].id] == false)
 		return false;
 	}
     }
@@ -432,23 +595,41 @@ function filter_demo(student, d_filters) {
 
 /* View functions */
 
-function midterm(change_bar)
+function midterm(change_bar, type)
 {
     currentView = 'midterm';
     show_loading();
 
-    console.log(all_students_midterm_offering1);
-
-    var students = all_students_midterm_offering1;
-    var num_questions = midterm_offering1_num_questions;
+    var students, num_questions;
 
     fill_instruction("midterm_instruction");
 
     if (change_bar) {
-	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
+	if (type == 0) {
+	    document.getElementById("sidebar").innerHTML = document.getElementById("midterm_sidebar").innerHTML;
+	} else {
+	    document.getElementById("sidebar").innerHTML = document.getElementById("final_sidebar").innerHTML;
+	}
+    
 	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
 
 	init_filters();
+    }
+
+   if (type == 0) {
+	num_questions = midterm_num_questions;
+	if (offerings == 1) {
+	    students = all_students_midterm_offering1;
+	} else {
+	    students = all_students_midterm_offering2;
+	}
+    } else if (type == 1) {
+	num_questions = final_num_questions;
+	if (offerings == 1) {
+	    students = all_students_final_offering1;
+	} else {
+	    students = all_students_final_offering2;
+	}
     }
 
     margin = {top: 20, right: 20, bottom: 150, left: 40};
@@ -537,7 +718,7 @@ function midterm(change_bar)
 	if (d.visible) {
 	    bands[k]= new Object();
 
-	    bands[k].name = "band" + k;
+	    bands[k].name = (d.low * 100) + "% To " + (d.high * 100) + "%";
 	    bands[k].index = k;
 	    bands[k].values = new Array();
 
@@ -651,16 +832,39 @@ function midterm(change_bar)
     hide_loading();
 }
 
-function midterm_question(change_bar)
+function midterm_question(change_bar, type)
 {
     currentView = 'midterm_question';
     show_loading();
-    
+
+    var students, num_questions;
+
     if (change_bar) {
-	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_question_sidebar").innerHTML;
+	if (type == 0) {
+	    document.getElementById("sidebar").innerHTML = document.getElementById("midterm_question_sidebar").innerHTML;
+	} else {
+	    document.getElementById("sidebar").innerHTML = document.getElementById("final_question_sidebar").innerHTML;
+	}
+
 	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
 
 	init_filters();
+    }
+
+    if (type == 0) {
+	num_questions = midterm_num_questions;
+	if (offerings == 1) {
+	    students = all_students_midterm_offering1;
+	} else {
+	    students = all_students_midterm_offering2;
+	}
+    } else if (type == 1) {
+	num_questions = final_num_questions;
+	if (offerings == 1) {
+	    students = all_students_final_offering1;
+	} else {
+	    students = all_students_final_offering2;
+	}
     }
 
     fill_instruction("midterm_question_instruction");
@@ -724,12 +928,13 @@ function midterm_question(change_bar)
     var index, i, j,k;
 
     k = 0;
+    var count = 0;
     if (partitioned == "perc") {
 	ranges.forEach(function(d) {
 	    if (d.visible) {
 		bands[k]= new Object();
 
-		bands[k].name = "band" + k;
+		bands[k].name = (d.low * 100) + "% To " + (d.high * 100) + "%";
 		bands[k].index = k;
 		bands[k].values = new Array();
 
@@ -746,8 +951,8 @@ function midterm_question(change_bar)
 
 		for (i = Math.floor(students.length * d.low); i < Math.floor(students.length * d.high); i++) {
 		    index = 0;
-		    students[i].values.forEach(function(d) {
-			bands[k].values[index].y1 += d.q_score;
+		    students[i].values.forEach(function(s) {
+			bands[k].values[index].y1 += s.q_score;
 			index += 1;
 		    });
 		}
@@ -773,7 +978,7 @@ function midterm_question(change_bar)
 	for (i = 0; i < demos.length; i++) {
 	    bands[i] = new Object();
 
-	    bands[i].name = "band" + i;
+	    bands[i].name = demos[i].name;
 	    bands[i].index = i;
 	    bands[i].values = new Array();
 
@@ -843,7 +1048,7 @@ function midterm_question(change_bar)
 	.attr("y", 6)
 	.attr("dy", ".71em")
 	.style("text-anchor", "end")
-	.text("Num answered correct ");
+	.text("Number answered correctly ");
 
     var bar_width = Math.round(width / 64) - 1;
     for (i = 0; i < bands.length; i++) {
@@ -912,16 +1117,53 @@ function midterm_question(change_bar)
     hide_loading();
 }
 
-function midterm_sbs(change_bar)
+function midterm_sbs(change_bar, type)
 {
     currentView = 'midterm_question';
     show_loading();
-    
+
     if (change_bar) {
-	document.getElementById("sidebar").innerHTML = document.getElementById("midterm_compare").innerHTML;
+	if (type == 0) {
+	    document.getElementById("sidebar").innerHTML = document.getElementById("midterm_compare").innerHTML;
+	} else {
+	    document.getElementById("sidebar").innerHTML = document.getElementById("final_compare").innerHTML;
+	}
 	document.getElementById("sidebar2").innerHTML = document.getElementById("emptybar").innerHTML;
 	init_filters();
     }
+
+    var students = new Array();
+    var num_questions;
+    if (type == 0) {
+	num_questions = midterm_num_questions;
+	if (offerings_g1 == 1) {
+	    students[0] = all_students_midterm_offering1;
+	} else {
+	    students[0] = all_students_midterm_offering2;
+	}
+
+	if (offerings_g2 == 1) {
+	    students[1] = all_students_midterm_offering1;
+	} else {
+	    students[1] = all_students_midterm_offering2;
+	}
+
+    } else if (type == 1) {
+	num_questions = final_num_questions;
+
+	if (offerings_g1 == 1) {
+	    students[0] = all_students_final_offering1;
+	} else {
+	    students[0] = all_students_final_offering2;
+	}
+
+	if (offerings_g2 == 1) {
+	    students[1] = all_students_final_offering1;
+	} else {
+	    students[1] = all_students_final_offering2;
+	}
+    }
+
 
     fill_instruction("midterm_compare_instruction");
 
@@ -989,7 +1231,7 @@ function midterm_sbs(change_bar)
     for (i = 0; i < 2; i++) {
 	bands[i]= new Object();
 
-	bands[i].name = "band" + i;
+	bands[i].name = "Group" + (i + 1);
 	bands[i].index = i;
 	bands[i].values = new Array();
 
@@ -1000,10 +1242,10 @@ function midterm_sbs(change_bar)
 	    bands[i].values[j].total = 0;
 	}
 
-	for (k = Math.floor(students.length * G_ranges[i].low); k < Math.floor(students.length * G_ranges[i].high); k++) {
+	for (k = Math.floor(students[i].length * G_ranges[i].low); k < Math.floor(students[i].length * G_ranges[i].high); k++) {
 	    index = 0;
-	    if (filter_demo(students[k], G_demo_filters[i])) {
-		students[k].values.forEach(function(d) {
+	    if (filter_demo((students[i])[k], G_demo_filters[i])) {
+		(students[i])[k].values.forEach(function(d) {
 		    bands[i].values[index].correct += d.q_score;
 		    bands[i].values[index].total += 1;
 		    index += 1;

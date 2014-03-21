@@ -70,7 +70,7 @@ td {
 #topbar .view {
   float: left;
   height: 50px;
-  width: 100px;
+  width: 150px;
   margin: 2px;
   border: 0px;
   padding: 0px;
@@ -178,6 +178,35 @@ td {
   border:0px;
   z-index:100;
 }
+
+/* View 1 specific. */
+.view1 {
+  font: 10px sans-serif;
+}
+
+.view1 .bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.view1 .bar text {
+  fill: #fff;
+}
+
+.view1 .axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.view1 .arc path {
+  stroke: #fff;
+}
+
+.view1 text {
+  z-index:200;
+}
+
 
 /* View 2 specific. */
 .view2 {

@@ -1,4 +1,19 @@
 \subsection{Performance}
+Our visualization tool is a web-based software that is mostly written in HTML and javascript. Despite the large amount of data we need to process, our tool has a very low response time. We highly optimize the performance of our software by avoiding repeated reading of data (load data only once in the beginning), maximizing references than copying, and reducing asymptotic complexity of filtering functions.
+
+We report the response time of different views in Table~\ref{tab:performance}. Load time indicates time taken to render a page, and filter time indicates time needed to apply some filter options and re-render the page. We ran each experiment for 10 times and took the average. We can see that most of the views are rendered within 50 milliseconds, which is a very reasonable number for a web application. We conducted the experiments on a Dell desktop machine, and all views were loaded instantenously and no significant delay were perceived.
+
+\begin{table}
+\begin{tabular}{ | c | c | c | c |}
+  \hline
+  View & Load Time (ms) & Filter Time (ms) \\ \hline
+  Midterm Aggregate & 31.4 & 28.8 \\ \hline
+  Midterm Questions & 41.6 & 43.8 \\ \hline
+  Midterm Comparison & 44.8 & 47 \\ \hline
+\end{tabular}
+\caption{Performance table. Shows page load time and filtering time of different views in milliseconds.}
+\label{tab:performance}
+\end{table}
 
 \subsection{Insights and Best Practices}
  TODO: input instruction box text here:

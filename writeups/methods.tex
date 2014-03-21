@@ -67,9 +67,14 @@ This view provides a scatterplot reflecting the impact of an assignment or exam 
 \label{fig:exam3}	
 \end{figure}
 
-\paragraph{Exam View (see Figure~\ref{fig:exam1})}
-TODO
+\paragraph{Exam View Aggregate(see Figure~\ref{fig:exam1})}
+This view shows aggregations of scores for the midterm and final exams, where the x value is the question number and the y value is the cumulative exam score. The emphasis of this view is showing the general trend of the exam. A steeper slope indicates that students are generally performing well for that section, while a flatter slope may indicate common misunderstandings. We further divide the students into different groups based on their exam result percentiles, and display on the graph as different bands. It servers to better facilitate instructors to identify questions that truly differentiate students' abilities and understandings.
 
+\paragraph{Exam View Per Question(see Figure~\ref{fig:exam2})}
+This view shows statistics for each individual question of the exam. The x-axis is the question number and the y-axis is the number of students that answered correctly. The bar chart gives the instructor a very easy view of how the students are doing for each question, by simply looking at the height of each bar. The stacked bars also make it easy to see the distribution of scores, and we provide different options to partition, for example, by percentiles, genders and age groups.
+
+\paragraph{Exam View Comparison(see Figure~\ref{fig:exam3})}
+We also provides a view to compare two groups of students. The two groups will have bars side by side for each question, showing the percentage of students answered the question correctly. This view becomes handy when the instructor wants to compare two groups of students. Some possible comparisons are: between two offerings, males and females, Asian and American students, etc. The rich set of demographic filters and selectors enables a wide range of possible comparisons.
 
 \begin{figure}[htb]
  \centering

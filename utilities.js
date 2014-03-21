@@ -1,3 +1,8 @@
+/*
+ * Common utility fuctions
+ *
+ */
+
 function fill_instruction(instruction_div)
 {
 

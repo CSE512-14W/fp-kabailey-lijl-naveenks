@@ -48,18 +48,18 @@ var G_demo_filters = [{Male:true,
 
 var ranges = [{index:0,
 	       visible:true,
-	       low:0,
-	       high:0.33
+	       low:0.3,
+	       high:0.5
 	      },
 	      {index:1,
 	       visible:true,
-	       low:0.33,
-	       high:0.66
+	       low:0.5,
+	       high:0.7
 	      },
 	      {index:2,
 	       visible:true,
-	       low:0.66,
-	       high:1
+	       low:0.7,
+	       high:0.9
 	      },
 	      {index:3,
 	       visible:false,
@@ -110,7 +110,7 @@ var partitioned = "perc";
 var partitioned_demo = "gender";
 
 /* Initialize student data */
-d3.csv("data/midterm_data.csv", function(error, data) {
+d3.csv("data/midterm_offering1.csv", function(error, data) {
     var keys = d3.keys(data[0]).filter(function(key) {return key != "question";});
     students = keys.map(function(name) {
 	var sum = 0;
@@ -128,7 +128,10 @@ d3.csv("data/midterm_data.csv", function(error, data) {
 		    score: score,
 		    q_score: q_score
 		};
-	    })
+	    }),
+	    demos: {gender: "M",
+		    age: 20
+		   }
 	};
     });
 
@@ -171,18 +174,18 @@ function init_filters()
 
     ranges = [{index:0,
 	       visible:true,
-	       low:0,
-	       high:0.33
+	       low:0.3,
+	       high:0.5
 	      },
 	      {index:1,
 	       visible:true,
-	       low:0.33,
-	       high:0.66
+	       low:0.5,
+	       high:0.7
 	      },
 	      {index:2,
 	       visible:true,
-	       low:0.66,
-	       high:1
+	       low:0.7,
+	       high:0.9
 	      },
 	      {index:3,
 	       visible:false,
@@ -421,6 +424,7 @@ function midterm(change_bar)
     var bands = new Array();
 
     k = 0;
+    var max_score = 0;
     ranges.forEach(function(d) {
 	if (d.visible) {
 	    bands[k]= new Object();
@@ -443,8 +447,11 @@ function midterm(change_bar)
 			if (d.score < bands[k].values[index].low)
 			    bands[k].values[index].low = d.score;
 			
-			if (d.score > bands[k].values[index].high)
+			if (d.score > bands[k].values[index].high) {
 			    bands[k].values[index].high = d.score;
+			    if (d.score > max_score)
+				max_score = d.score;
+			}
 
 			if (bands[k].values[index].low == bands[k].values[index].high)
 			    bands[k].values[index].high += 1;
@@ -458,10 +465,10 @@ function midterm(change_bar)
     });
 
     x.domain([1, 64]);
-    y.domain([0, 500]);
+    y.domain([0, max_score + 50]);
 
     x2.domain([1, 64]);
-    y2.domain([0, 500]);
+    y2.domain([0, max_score + 50]);
     
     focus.append("g")
 	.attr("class", "x axis")
@@ -697,10 +704,10 @@ function midterm_question(change_bar)
     }
 
     x.domain([1, 64]);
-    y.domain([0, 30]);
+    y.domain([0, students.length]);
 
     x2.domain([1, 64]);
-    y2.domain([0, 30]);
+    y2.domain([0, students.length]);
 
     focus.append("g")
 	.attr("class", "x axis")

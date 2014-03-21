@@ -31,7 +31,7 @@ td {
   border-radius:10px;
 }
 
-#instruction {
+#information {
   position:relative;
   height: 200px;
   width: 900px;
@@ -41,12 +41,21 @@ td {
   border-radius:10px;
 }
 
+#information p .filterlabel {
+  color: #3182bd;
+  text-transform:capitalize;
+  font-variant:small-caps;
+  font-weight:bold;
+  font-size: 120%;
+}
+
 .instruction_box {
     position:relative;
     overflow:auto;
-    height: 200px;
+    height: 138px;
     width: 900px;
 }
+
 
 #sidebar {
   height: 600px;

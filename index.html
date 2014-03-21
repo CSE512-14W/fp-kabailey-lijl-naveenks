@@ -21,11 +21,11 @@
   
   <tr><td id=topbar colspan=2>
     <div class=view onclick="view1()"> Demographics </div>
-    <div class=view onclick="aggregate()"> All Grades</div>
-    <div class=view onclick="hwtimescales()"> Timestamps</div>
+    <div class=view onclick="aggregate(true)"> Assignments</div>
+    <div class=view onclick="hwtimescales(true)"> Timestamps</div>
     <div class=view onclick="midterm(true)"> Midterm </div>
     <div class=view onclick="view3()"> Final</div>
-    <div class=view onclick="view5()"> Impact</div>
+<!--    <div class=view onclick="view5()"> Impact</div> -->
   </td></tr>
 
   <tr>
@@ -49,60 +49,60 @@
 <!--  not displayed side bars for each view -->
 <div id="timestamps" style="display: none;">
   <p><span class=filterlabel>Display Course Offering</span><br />
-    <select id=offering onchange="switchoffer(this.value)">
+    <select id="t_offering" onchange="tswitchoffer(this.value)">
     <option value="1">Offering 001</option>
     <option value="2">Offering 002</option>
     </select> <br/>
   </p>
 
-  <p><span class=filterlabel>Include Assignments</span><br />
-    <select id="display" onchange="switchassign(this.value)">
+  <p><span class=filterlabel>View Assignment</span><br />
+    <select id="t_display" onchange="tswitchassign(this.value)">
       <option value="1">Assignment 1</option>
       <option value="2">Assignment 2</option>
       <option value="3">Assignment 3</option>
-      <option value="4">Midterm Exam</option>
       <option value="5">Assignment 4</option>
       <option value="6">Assignment 5</option>
       <option value="7">Assignment 6</option>
-      <option value="8">Final Exam</option>
     </select> <br/>
   </p>
 
   <p><span class=filterlabel>Color Display By</span><br />
-    <input type="radio" name="color" onchange="switchcolor(0)">None<br />
-    <input type="radio" name="color" onchange="switchcolor(1)">Gender<br />
-    <input type="radio" name="color" onchange="switchcolor(2)">Age Groups <br />
-    <input type="radio" name="color" onchange="switchcolor(3)">Background <br />
-    <input type="radio" name="color" onchange="switchcolor(4)">Country <br /> </p>
+    <select id="t_color" onchange="tswitchcolor(this.value)">
+      <option value="0">None</option>
+      <option value="1">Gender</option>
+      <option value="2">Age Groups</option>
+      <option value="3">Background</option>
+      <option value="4">Country</option>
+    </select> <br/>
+  </p>
 </div>
 
 <div id="allgrades" style="display: none;">
-  <p><span class=filterlabel>Display Course Offering</span><br />
-    <select id=offering onchange="switchoffer(this.value)">
+ <p><span class=filterlabel>Display Course Offering</span><br />
+    <select id="a_offering" onchange="switchoffer(this.value)">
     <option value="1">Offering 001</option>
     <option value="2">Offering 002</option>
     </select> <br/>
   </p>
 
   <p><span class=filterlabel>Include Assignments</span><br />
-    <select id="display" onchange="switchassign(this.value)">
-      <option value="1">Assignment 1</option>
-      <option value="2">Assignment 2</option>
-      <option value="3">Assignment 3</option>
-      <option value="4">Midterm Exam</option>
-      <option value="5">Assignment 4</option>
-      <option value="6">Assignment 5</option>
-      <option value="7">Assignment 6</option>
-      <option value="8">Final Exam</option>
-    </select> <br/>
+      <input type="checkbox" name="box1" onchange="checkbox1(this.checked)" checked>Assignment 1</br>
+      <input type="checkbox" name="box2" onchange="checkbox2(this.checked)" checked>Assignment 2</br>
+      <input type="checkbox" name="box3" onchange="checkbox3(this.checked)" checked>Assignment 3</br>
+      <input type="checkbox" name="box4" onchange="checkbox4(this.checked)" checked>Assignment 4</br>
+      <input type="checkbox" name="box5" onchange="checkbox5(this.checked)" checked>Assignment 5</br>
+      <input type="checkbox" name="box6" onchange="checkbox6(this.checked)" checked>Assignment 6</br>
   </p>
 
-  <p><span class=filterlabel>Color Display By</span><br />
-    <input type="radio" name="color" onchange="switchcolor(0)">None<br />
-    <input type="radio" name="color" onchange="switchcolor(1)">Gender<br />
-    <input type="radio" name="color" onchange="switchcolor(2)">Age Groups <br />
-    <input type="radio" name="color" onchange="switchcolor(3)">Background <br />
-    <input type="radio" name="color" onchange="switchcolor(4)">Country <br /> </p>
+  <p><span class=filterlabel> Display How Many Clusters?</span><br />
+    <select id="cluster_display" onchange="switchclusters(this.value)">
+      <option value="0">Individual Data</option>
+      <option value="1">1 Cluster (avg)</option>
+      <option value="2">2 Clusters</option>
+      <option value="4">4 Clusters</option>
+      <option value="8">8 Clusters</option>
+    </select>
+  </p>
 </div>
 
 <!-- Midterm side bars -->
@@ -890,4 +890,11 @@
   <p>You can zoom in on a smaller set of questions by using the brushing in the secondary region.</p>
   <p>Click the "Submit" button to reflect all the changes.</p>
   <p>Click the "QuestionView" button to go back to the per question view. </p>
+</div>
+
+<div id="clustered_instruction" style="display: none;">
+  This is the grade overview panel. It's most useful in cluster mode: you can view the performance trends for student clusters of roughly equal size. The lower clusters tend to indicate drop-off rate due to assignments, while the upper clusters show improvement and fan-out in the grades of those who complete the course.
+  <p>You can switch between the offerings with the dropdown menu at upper right. </p>
+  <p>The x-axis is the assignment id number and the y-axis is the score, out of 100 percent (most assignments had extra credit options). Each line represents one student or cluster. If in clusters, it reprents the average of all N students in the cluster (roughly enrollment/N). You can select to show all students or a number of clusters via the lower dropdown on the right. 
+  <p> You can filter the assignment by the checkboxes, to show more general trends, e.g from the start to end of class. 
 </div>
